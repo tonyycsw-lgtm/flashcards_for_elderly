@@ -6,7 +6,6 @@
     <title>懷舊記憶卡 - 給香港長者的認知訓練</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 樣式保持不變，從之前的版本複製 */
         * {
             margin: 0;
             padding: 0;
@@ -55,7 +54,6 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
             border: 3px solid #e0e7ff;
             justify-content: center;
-            min-height: 100px;
         }
         
         .tab-btn {
@@ -90,10 +88,6 @@
             color: white;
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
-        }
-        
-        .tab-btn.disabled {
-            display: none; /* 隱藏沒有數據的分類 */
         }
         
         .category-content {
@@ -423,6 +417,7 @@
             .tab-btn { min-width: 150px; padding: 15px 20px; font-size: 1.1rem; }
             .card-word { font-size: 2.5rem; }
             .lang-toggle { bottom: 20px; right: 20px; padding: 15px 25px; }
+            .audio-btn { width: 60px; height: 60px; font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -438,90 +433,161 @@
         <p class="subtitle">點擊卡片翻轉查看圖片 • 點擊喇叭聆聽發音</p>
     </div>
     
-    <!-- 分類標籤容器（會動態生成） -->
-    <div class="category-tabs" id="categoryTabs">
-        <!-- 將由 JavaScript 動態生成 -->
+    <!-- 分類標籤 -->
+    <div class="category-tabs">
+        <button class="tab-btn active" data-category="fruit"><i class="fas fa-apple-alt"></i> 水果</button>
+        <button class="tab-btn" data-category="color"><i class="fas fa-palette"></i> 顏色</button>
+        <button class="tab-btn" data-category="clothing"><i class="fas fa-tshirt"></i> 服裝</button>
+        <button class="tab-btn" data-category="toy"><i class="fas fa-robot"></i> 玩具/遊戲</button>
+        <button class="tab-btn" data-category="transport"><i class="fas fa-bus"></i> 交通工具</button>
+        <button class="tab-btn" data-category="vintage"><i class="fas fa-clock"></i> 懷舊物品</button>
+        <button class="tab-btn" data-category="emotion"><i class="fas fa-smile"></i> 情緒</button>
     </div>
     
-    <!-- 分類內容容器（會動態生成） -->
-    <div id="categoryContents">
-        <!-- 將由 JavaScript 動態生成 -->
+    <!-- 水果分類 -->
+    <div id="category-fruit" class="category-content active">
+        <div class="category-title"><i class="fas fa-apple-alt"></i> 水果</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看圖片 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="fruit-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="fruit-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="fruit-page">1/1</div>
+            <button class="nav-btn" id="fruit-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 顏色分類 -->
+    <div id="category-color" class="category-content">
+        <div class="category-title"><i class="fas fa-palette"></i> 顏色</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看顏色 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="color-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="color-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="color-page">1/1</div>
+            <button class="nav-btn" id="color-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 服裝分類 -->
+    <div id="category-clothing" class="category-content">
+        <div class="category-title"><i class="fas fa-tshirt"></i> 服裝</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看衣物 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="clothing-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="clothing-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="clothing-page">1/1</div>
+            <button class="nav-btn" id="clothing-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 玩具/遊戲分類 -->
+    <div id="category-toy" class="category-content">
+        <div class="category-title"><i class="fas fa-robot"></i> 玩具/遊戲</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看玩具 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="toy-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="toy-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="toy-page">1/1</div>
+            <button class="nav-btn" id="toy-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 交通工具分類 -->
+    <div id="category-transport" class="category-content">
+        <div class="category-title"><i class="fas fa-bus"></i> 交通工具</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看交通工具 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="transport-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="transport-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="transport-page">1/1</div>
+            <button class="nav-btn" id="transport-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 懷舊物品分類 -->
+    <div id="category-vintage" class="category-content">
+        <div class="category-title"><i class="fas fa-clock"></i> 懷舊物品</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看懷舊物品 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="vintage-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="vintage-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="vintage-page">1/1</div>
+            <button class="nav-btn" id="vintage-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 情緒分類 -->
+    <div id="category-emotion" class="category-content">
+        <div class="category-title"><i class="fas fa-smile"></i> 情緒</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看表情 • 點擊喇叭聽發音</div>
+        <div class="flashcards-grid" id="emotion-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="emotion-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="emotion-page">1/1</div>
+            <button class="nav-btn" id="emotion-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
     </div>
     
     <button class="lang-toggle" id="langToggle">
         <i class="fas fa-language"></i> <span>切換至普通話</span>
     </button>
 
+    <!-- 加載數據文件 -->
+    <script src="data/data.js"></script>
+    <script src="data/fruit.js"></script>
+    <script src="data/color.js"></script>
+    <script src="data/clothing.js"></script>
+    <script src="data/toy.js"></script>
+    <script src="data/transport.js"></script>
+    <script src="data/vintage.js"></script>
+    <script src="data/emotion.js"></script>
+
     <script>
-        // ========== 配置 ==========
-        const CATEGORIES = [
-            { id: 'food', name: '食物', icon: 'fa-apple-alt' },
-            { id: 'color', name: '顏色', icon: 'fa-palette' },
-            { id: 'clothing', name: '服裝', icon: 'fa-tshirt' },
-            { id: 'toy', name: '玩具/遊戲', icon: 'fa-robot' },
-            { id: 'transport', name: '交通工具', icon: 'fa-bus' },
-            { id: 'vintage', name: '懷舊物品', icon: 'fa-clock' },
-            { id: 'emotion', name: '情緒', icon: 'fa-smile' }
-        ];
-        
-        // 初始化數據對象
-        window.cardsData = {};
-        CATEGORIES.forEach(cat => {
-            window.cardsData[cat.id] = [];
-        });
-        console.log('數據系統已初始化');
-        
         // 全局變數
         let currentAudio = null;
         let currentPlayingButton = null;
         let currentLanguage = 'cantonese';
         const CARDS_PER_PAGE = 5;
-        let loadedCategories = 0;
-        let availableCategories = []; // 存儲有數據的分類
         
         // 當前頁碼
-        let currentPages = {};
-        CATEGORIES.forEach(cat => {
-            currentPages[cat.id] = 1;
-        });
+        let currentPages = {
+            fruit: 1,
+            color: 1,
+            clothing: 1,
+            toy: 1,
+            transport: 1,
+            vintage: 1,
+            emotion: 1
+        };
         
-        // ========== 動態加載數據文件 ==========
-        function loadCategoryData(category) {
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = `data/${category.id}.js`;
-                
-                script.onload = function() {
-                    console.log(`✅ 成功加載: ${category.id}.js`);
-                    loadedCategories++;
-                    
-                    // 檢查是否有數據
-                    if (window.cardsData[category.id] && window.cardsData[category.id].length > 0) {
-                        availableCategories.push(category);
-                    }
-                    
-                    updateLoadingProgress();
-                    resolve(true);
-                };
-                
-                script.onerror = function() {
-                    console.log(`⚠️ 文件不存在: ${category.id}.js (使用空數據)`);
-                    loadedCategories++;
-                    updateLoadingProgress();
-                    resolve(false);
-                };
-                
-                document.head.appendChild(script);
-            });
-        }
+        // 分類名稱映射
+        const categoryNames = {
+            fruit: '水果',
+            color: '顏色',
+            clothing: '服裝',
+            toy: '玩具/遊戲',
+            transport: '交通工具',
+            vintage: '懷舊物品',
+            emotion: '情緒'
+        };
         
-        // 更新加載進度
-        function updateLoadingProgress() {
-            const progress = document.getElementById('loadingProgress');
-            progress.textContent = `已檢查 ${loadedCategories}/${CATEGORIES.length} 個分類`;
+        // 檢查數據加載狀態
+        function checkDataLoaded() {
+            const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
+            let loadedCount = 0;
+            let totalCards = 0;
             
-            if (loadedCategories === CATEGORIES.length) {
-                // 所有文件都檢查完畢
+            categories.forEach(cat => {
+                if (window.cardsData[cat] && window.cardsData[cat].length > 0) {
+                    loadedCount++;
+                    totalCards += window.cardsData[cat].length;
+                }
+            });
+            
+            document.getElementById('loadingProgress').textContent = `已加載 ${loadedCount}/7 個分類，共 ${totalCards} 張卡片`;
+            console.log(`已加載 ${loadedCount}/7 個分類，共 ${totalCards} 張卡片`);
+            
+            if (loadedCount > 0) {
                 setTimeout(() => {
                     document.getElementById('loadingOverlay').style.opacity = '0';
                     setTimeout(() => {
@@ -529,116 +595,25 @@
                     }, 500);
                 }, 500);
                 
-                // 生成分類標籤和內容
-                generateCategories();
-            }
-        }
-        
-        // ========== 生成分類標籤和內容 ==========
-        function generateCategories() {
-            const tabsContainer = document.getElementById('categoryTabs');
-            const contentsContainer = document.getElementById('categoryContents');
-            
-            tabsContainer.innerHTML = '';
-            contentsContainer.innerHTML = '';
-            
-            if (availableCategories.length === 0) {
-                // 沒有任何數據
-                tabsContainer.innerHTML = '<div style="padding: 30px; text-align: center;">暫無任何數據，請添加數據文件</div>';
-                return;
-            }
-            
-            // 為每個有數據的分類創建標籤和內容
-            availableCategories.forEach((category, index) => {
-                // 創建標籤按鈕
-                const tabBtn = document.createElement('button');
-                tabBtn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-                tabBtn.dataset.category = category.id;
-                tabBtn.innerHTML = `<i class="fas ${category.icon}"></i> ${category.name}`;
-                tabsContainer.appendChild(tabBtn);
-                
-                // 創建內容區域
-                const contentDiv = document.createElement('div');
-                contentDiv.id = `category-${category.id}`;
-                contentDiv.className = `category-content ${index === 0 ? 'active' : ''}`;
-                contentDiv.innerHTML = `
-                    <div class="category-title"><i class="fas ${category.icon}"></i> ${category.name}</div>
-                    <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看圖片 • 點擊喇叭聽發音</div>
-                    <div class="flashcards-grid" id="${category.id}-cards"></div>
-                    <div class="nav-controls">
-                        <button class="nav-btn" id="${category.id}-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
-                        <div class="page-indicator" id="${category.id}-page">1/1</div>
-                        <button class="nav-btn" id="${category.id}-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
-                    </div>
-                `;
-                contentsContainer.appendChild(contentDiv);
-            });
-            
-            // 綁定標籤事件
-            bindTabEvents();
-            
-            // 綁定分頁事件
-            bindPaginationEvents();
-            
-            // 渲染第一個分類
-            if (availableCategories.length > 0) {
-                renderCards(availableCategories[0].id, 1);
-            }
-        }
-        
-        // ========== 綁定標籤事件 ==========
-        function bindTabEvents() {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const category = this.dataset.category;
-                    
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
-                    document.getElementById(`category-${category}`).classList.add('active');
-                    
-                    if (window.cardsData[category] && window.cardsData[category].length > 0) {
-                        renderCards(category, currentPages[category] || 1);
+                // 初始化第一個有數據的分類
+                for (let cat of categories) {
+                    if (window.cardsData[cat] && window.cardsData[cat].length > 0) {
+                        renderCards(cat, 1);
+                        break;
                     }
-                });
-            });
+                }
+            } else {
+                // 1秒後再檢查
+                setTimeout(checkDataLoaded, 1000);
+            }
         }
         
-        // ========== 綁定分頁事件 ==========
-        function bindPaginationEvents() {
-            availableCategories.forEach(category => {
-                const prevBtn = document.getElementById(`${category.id}-prev`);
-                const nextBtn = document.getElementById(`${category.id}-next`);
-                
-                if (prevBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        if (currentPages[category.id] > 1) {
-                            currentPages[category.id]--;
-                            renderCards(category.id, currentPages[category.id]);
-                        }
-                    });
-                }
-                
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', () => {
-                        const cards = window.cardsData[category.id] || [];
-                        const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
-                        if (currentPages[category.id] < totalPages) {
-                            currentPages[category.id]++;
-                            renderCards(category.id, currentPages[category.id]);
-                        }
-                    });
-                }
-            });
-        }
-        
-        // ========== 渲染卡片 ==========
-        function renderCards(categoryId, page) {
-            const container = document.getElementById(`${categoryId}-cards`);
+        // 渲染卡片
+        function renderCards(category, page) {
+            const container = document.getElementById(`${category}-cards`);
             if (!container) return;
             
-            const cards = window.cardsData[categoryId] || [];
+            const cards = window.cardsData[category] || [];
             
             if (cards.length === 0) {
                 container.innerHTML = '<div class="no-data-message">此分類暫無卡片數據</div>';
@@ -655,13 +630,11 @@
             pageCards.forEach(card => {
                 const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
                 
-                const categoryInfo = CATEGORIES.find(c => c.id === categoryId);
-                
                 const cardHtml = `
-                    <div class="flashcard" data-category="${categoryId}">
+                    <div class="flashcard" data-category="${category}">
                         <div class="card-inner">
                             <div class="card-front">
-                                <div class="card-category-badge"><i class="fas ${categoryInfo.icon}"></i> ${categoryInfo.name}</div>
+                                <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryNames[category]}</div>
                                 <div class="card-front-content">
                                     <div class="card-word">${card.word}</div>
                                     <div class="card-word-desc">${card.desc}</div>
@@ -676,7 +649,7 @@
                                 </div>
                             </div>
                             <div class="card-back">
-                                <img src="${card.img || 'images/placeholder.png'}" alt="${card.word}" class="card-back-image" onerror="this.src='images/placeholder.png'">
+                                <img src="${card.img}" alt="${card.word}" class="card-back-image" onerror="this.src='images/placeholder.png'">
                             </div>
                         </div>
                     </div>
@@ -686,23 +659,23 @@
             });
             
             // 更新頁碼
-            const pageIndicator = document.getElementById(`${categoryId}-page`);
+            const pageIndicator = document.getElementById(`${category}-page`);
             if (pageIndicator) {
                 pageIndicator.textContent = `${page}/${totalPages}`;
             }
             
             // 更新按鈕狀態
-            const prevBtn = document.getElementById(`${categoryId}-prev`);
-            const nextBtn = document.getElementById(`${categoryId}-next`);
+            const prevBtn = document.getElementById(`${category}-prev`);
+            const nextBtn = document.getElementById(`${category}-next`);
             if (prevBtn) prevBtn.disabled = page <= 1;
             if (nextBtn) nextBtn.disabled = page >= totalPages;
             
-            // 綁定卡片事件
-            bindCardEvents();
+            // 綁定事件
+            bindEvents();
         }
         
-        // ========== 綁定卡片事件 ==========
-        function bindCardEvents() {
+        // 綁定事件
+        function bindEvents() {
             // 卡片翻轉
             document.querySelectorAll('.flashcard').forEach(card => {
                 card.addEventListener('click', function(e) {
@@ -740,9 +713,7 @@
                     
                     try {
                         currentAudio = new Audio(audioPath);
-                        currentAudio.play().catch(() => {
-                            // 忽略自動播放錯誤
-                        });
+                        currentAudio.play().catch(() => {});
                         
                         currentAudio.onended = function() {
                             btn.classList.remove('playing');
@@ -763,27 +734,63 @@
             });
         }
         
-        // ========== 語言切換 ==========
+        // 標籤切換
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const category = this.dataset.category;
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`category-${category}`).classList.add('active');
+                
+                if (window.cardsData[category] && window.cardsData[category].length > 0) {
+                    renderCards(category, currentPages[category] || 1);
+                }
+            });
+        });
+        
+        // 分頁按鈕
+        const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
+        categories.forEach(category => {
+            const prevBtn = document.getElementById(`${category}-prev`);
+            const nextBtn = document.getElementById(`${category}-next`);
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentPages[category] > 1) {
+                        currentPages[category]--;
+                        renderCards(category, currentPages[category]);
+                    }
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    const cards = window.cardsData[category] || [];
+                    const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
+                    if (currentPages[category] < totalPages) {
+                        currentPages[category]++;
+                        renderCards(category, currentPages[category]);
+                    }
+                });
+            }
+        });
+        
+        // 語言切換
         document.getElementById('langToggle').addEventListener('click', function() {
             currentLanguage = currentLanguage === 'cantonese' ? 'mandarin' : 'cantonese';
             this.querySelector('span').textContent = currentLanguage === 'cantonese' ? '切換至普通話' : '切換至粵語';
             
-            const activeTab = document.querySelector('.tab-btn.active');
-            if (activeTab) {
-                const categoryId = activeTab.dataset.category;
-                renderCards(categoryId, currentPages[categoryId] || 1);
+            const activeCategory = document.querySelector('.tab-btn.active')?.dataset.category;
+            if (activeCategory && window.cardsData[activeCategory]) {
+                renderCards(activeCategory, currentPages[activeCategory] || 1);
             }
         });
         
-        // ========== 開始加載所有分類 ==========
-        async function loadAllCategories() {
-            for (const category of CATEGORIES) {
-                await loadCategoryData(category);
-            }
-        }
-        
-        // 開始加載
-        loadAllCategories();
+        // 開始檢查數據
+        setTimeout(checkDataLoaded, 500);
     </script>
 </body>
 </html>
