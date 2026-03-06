@@ -629,115 +629,119 @@
             return null;
         }
         
-        // ========== 改良版TTS播放 ==========
-        function playTTSSequence(word, example1, example2, button) {
-            let step = 0;
-            // 播放順序：名詞2次，例句1一次，例句2一次
-            const playSteps = [
-                { type: 'word', text: word, repeat: 2 },        // 名詞讀2次
-                { type: 'example1', text: example1, repeat: 1 }, // 例句1讀1次
-                { type: 'example2', text: example2, repeat: 1 }  // 例句2讀1次
-            ];
-            
-            let currentStepIndex = 0;
-            let currentRepeatCount = 0;
-            
-            function speakNext() {
-                if (currentStepIndex >= playSteps.length) {
-                    // 全部播放完畢
-                    button.classList.remove('playing');
-                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    currentPlayingButton = null;
-                    return;
-                }
-                
-                const step = playSteps[currentStepIndex];
-                
-                const utterance = new SpeechSynthesisUtterance(step.text);
-                
-                // 設置語言和語音
-                if (currentLanguage === 'cantonese') {
-                    utterance.lang = 'zh-HK';
-                    const bestVoice = getBestVoice('zh-HK');
-                    if (bestVoice) utterance.voice = bestVoice;
-                } else {
-                    utterance.lang = 'zh-CN';
-                    const bestVoice = getBestVoice('zh-CN');
-                    if (bestVoice) utterance.voice = bestVoice;
-                }
-                
-                // 設置語速較慢，適合長者
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                utterance.volume = 1;
-                
-                utterance.onend = function() {
-                    currentRepeatCount++;
-                    
-                    if (currentRepeatCount < step.repeat) {
-                        // 同一句需要重複，間隔0.8秒
-                        setTimeout(speakNext, 800);
-                    } else {
-                        // 進入下一句
-                        currentStepIndex++;
-                        currentRepeatCount = 0;
-                        
-                        if (currentStepIndex < playSteps.length) {
-                            // 不同句之間間隔1.5秒
-                            setTimeout(speakNext, 1500);
-                        } else {
-                            // 全部播放完畢
-                            setTimeout(() => {
-                                button.classList.remove('playing');
-                                button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                                currentPlayingButton = null;
-                            }, 100);
-                        }
-                    }
-                };
-                
-                utterance.onerror = function() {
-                    console.log('TTS錯誤，跳過此句');
-                    currentStepIndex++;
-                    currentRepeatCount = 0;
-                    setTimeout(speakNext, 100);
-                };
-                
-                window.speechSynthesis.speak(utterance);
-            }
-            
-            speakNext();
+// ========== 修正版 TTS 播放（確保正確次數） ==========
+function playTTSSequence(word, example1, example2, button) {
+    // 建立播放隊列
+    const playQueue = [];
+    
+    // 名詞讀2次
+    playQueue.push({ text: word, type: 'word' });
+    playQueue.push({ text: word, type: 'word' });
+    
+    // 例句1讀1次
+    playQueue.push({ text: example1, type: 'example1' });
+    
+    // 例句2讀1次
+    playQueue.push({ text: example2, type: 'example2' });
+    
+    let currentIndex = 0;
+    
+    function speakNext() {
+        if (currentIndex >= playQueue.length) {
+            // 全部播放完畢
+            button.classList.remove('playing');
+            button.innerHTML = '<i class="fas fa-volume-up"></i>';
+            currentPlayingButton = null;
+            return;
         }
         
-        // ========== 播放本地音頻 ==========
-        function playLocalAudio(audioPath, word, example1, example2, button) {
-            try {
-                currentAudio = new Audio(audioPath);
-                
-                currentAudio.onended = function() {
-                    currentAudio = null;
+        const currentItem = playQueue[currentIndex];
+        const utterance = new SpeechSynthesisUtterance(currentItem.text);
+        
+        // 設置語言和語音
+        if (currentLanguage === 'cantonese') {
+            utterance.lang = 'zh-HK';
+            const bestVoice = getBestVoice('zh-HK');
+            if (bestVoice) utterance.voice = bestVoice;
+        } else {
+            utterance.lang = 'zh-CN';
+            const bestVoice = getBestVoice('zh-CN');
+            if (bestVoice) utterance.voice = bestVoice;
+        }
+        
+        // 設置語速較慢，適合長者
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        
+        utterance.onend = function() {
+            currentIndex++;
+            
+            // 同一類型句子之間間隔0.8秒，不同句子之間間隔1.5秒
+            if (currentIndex < playQueue.length) {
+                const nextItem = playQueue[currentIndex];
+                const delay = (nextItem.type === currentItem.type) ? 800 : 1500;
+                setTimeout(speakNext, delay);
+            } else {
+                // 全部播放完畢
+                setTimeout(() => {
                     button.classList.remove('playing');
                     button.innerHTML = '<i class="fas fa-volume-up"></i>';
                     currentPlayingButton = null;
-                };
-                
-                currentAudio.onerror = function() {
-                    console.log('本地音頻播放失敗，改用 TTS');
-                    currentAudio = null;
-                    playTTSSequence(word, example1, example2, button);
-                };
-                
-                currentAudio.play().catch(error => {
-                    console.log('本地音頻播放錯誤:', error);
-                    currentAudio = null;
-                    playTTSSequence(word, example1, example2, button);
-                });
-                
-            } catch (error) {
-                console.log('本地音頻初始化錯誤:', error);
-                playTTSSequence(word, example1, example2, button);
+                }, 100);
             }
-        }
+        };
+        
+        utterance.onerror = function() {
+            console.log('TTS錯誤，跳過此句');
+            currentIndex++;
+            setTimeout(speakNext, 100);
+        };
+        
+        window.speechSynthesis.speak(utterance);
+    }
+    
+    speakNext();
+}
+        
+// ========== 修正版本地音頻播放 ==========
+function playLocalAudio(audioPath, word, example1, example2, button) {
+    try {
+        // 注意：本地音頻文件通常只包含單次朗讀
+        // 如果需要重複名詞2次，可能需要使用TTS或準備特殊音頻
+        // 這裡我們統一使用TTS來確保正確的播放順序
+        
+        console.log('使用TTS播放（確保正確的播放次數）');
+        playTTSSequence(word, example1, example2, button);
+        
+        /* 如果您的本地音頻已經包含了正確的順序，可以使用以下代碼：
+        currentAudio = new Audio(audioPath);
+        
+        currentAudio.onended = function() {
+            currentAudio = null;
+            button.classList.remove('playing');
+            button.innerHTML = '<i class="fas fa-volume-up"></i>';
+            currentPlayingButton = null;
+        };
+        
+        currentAudio.onerror = function() {
+            console.log('本地音頻播放失敗，改用 TTS');
+            currentAudio = null;
+            playTTSSequence(word, example1, example2, button);
+        };
+        
+        currentAudio.play().catch(error => {
+            console.log('本地音頻播放錯誤:', error);
+            currentAudio = null;
+            playTTSSequence(word, example1, example2, button);
+        });
+        */
+        
+    } catch (error) {
+        console.log('本地音頻初始化錯誤:', error);
+        playTTSSequence(word, example1, example2, button);
+    }
+}
         
         // ========== 停止所有音頻 ==========
         function stopAllAudio() {
