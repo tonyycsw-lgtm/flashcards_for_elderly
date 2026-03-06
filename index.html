@@ -136,7 +136,7 @@
         /* 恢復原來的卡片高度，圖片更大 */
         .flashcard {
             perspective: 1200px;
-            height: 500px;  /* 增加高度讓圖片更大 */
+            height: 500px;
             cursor: pointer;
         }
         
@@ -235,9 +235,10 @@
             align-items: center;
         }
         
+        /* 加大播放按鈕尺寸 */
         .audio-btn {
-            width: 70px;
-            height: 70px;
+            width: 90px;      /* 從70px加大到90px */
+            height: 90px;      /* 從70px加大到90px */
             border-radius: 50%;
             background-color: white;
             color: #667eea;
@@ -247,8 +248,8 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 2rem;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            font-size: 2.5rem;  /* 從2rem加大到2.5rem */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
             z-index: 10;
         }
         
@@ -265,7 +266,7 @@
         
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            70% { box-shadow: 0 0 0 25px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
         
@@ -408,7 +409,7 @@
             .tab-btn { min-width: 150px; padding: 15px 20px; font-size: 1.1rem; }
             .card-word { font-size: 2.5rem; }
             .lang-toggle { bottom: 20px; right: 20px; padding: 15px 25px; }
-            .audio-btn { width: 60px; height: 60px; font-size: 1.8rem; }
+            .audio-btn { width: 80px; height: 80px; font-size: 2.2rem; }
         }
     </style>
 </head>
@@ -528,11 +529,14 @@
 
     <script>
         // 全局變數
-        let currentAudio = null;  // 用於本地音頻
-        let currentUtterance = null;  // 用於 TTS
+        let currentAudio = null;
         let currentPlayingButton = null;
         let currentLanguage = 'cantonese';  // 預設為粵語
-        const CARDS_PER_PAGE = 6;  // 每頁6張卡片（2列 × 3行）
+        let voiceCache = {
+            'zh-CN': null,
+            'zh-HK': null
+        };
+        const CARDS_PER_PAGE = 6;  // 每頁6張卡片
         
         // 當前頁碼
         let currentPages = {
@@ -556,7 +560,204 @@
             emotion: '情緒'
         };
         
-        // 檢查數據加載狀態
+        // ========== 改良版TTS語音選擇 ==========
+        function getBestVoice(lang) {
+            // 如果已經快取，直接返回
+            if (voiceCache[lang]) return voiceCache[lang];
+            
+            const voices = window.speechSynthesis.getVoices();
+            console.log('可用語音:', voices.map(v => `${v.name} (${v.lang})`));
+            
+            if (lang === 'zh-CN') {
+                // 普通話語音優先級（由高到低）
+                const priorityPatterns = [
+                    { name: 'Microsoft Xiaoxiao', lang: 'zh-CN' },  // 微軟曉曉（最自然）
+                    { name: 'Xiaoxiao', lang: 'zh-CN' },
+                    { name: 'Microsoft Yunxi', lang: 'zh-CN' },     // 微軟雲希（男聲）
+                    { name: 'Yunxi', lang: 'zh-CN' },
+                    { name: 'Microsoft Yunyang', lang: 'zh-CN' },   // 微軟雲揚
+                    { name: 'Yunyang', lang: 'zh-CN' },
+                    { name: 'Google 普通话', lang: 'zh-CN' },        // Google
+                    { name: 'Google', lang: 'zh-CN' },
+                    { name: '普通话', lang: 'zh-CN' },               // 系統普通話
+                    { name: '中文', lang: 'zh-CN' }                  // 備選
+                ];
+                
+                for (let pattern of priorityPatterns) {
+                    const match = voices.find(v => 
+                        v.name.includes(pattern.name) && v.lang === pattern.lang
+                    );
+                    if (match) {
+                        console.log('選擇普通話語音:', match.name);
+                        voiceCache[lang] = match;
+                        return match;
+                    }
+                }
+            } else if (lang === 'zh-HK') {
+                // 粵語語音優先級
+                const priorityPatterns = [
+                    { name: 'Microsoft HiuGaai', lang: 'zh-HK' },   // 微軟曉佳（香港）
+                    { name: 'HiuGaai', lang: 'zh-HK' },
+                    { name: 'Microsoft HiuMaan', lang: 'zh-HK' },   // 微軟曉曼
+                    { name: 'HiuMaan', lang: 'zh-HK' },
+                    { name: 'Google 粵語', lang: 'zh-HK' },
+                    { name: 'Google', lang: 'zh-HK' },
+                    { name: '廣東話', lang: 'zh-HK' },
+                    { name: 'Cantonese', lang: 'zh-HK' }
+                ];
+                
+                for (let pattern of priorityPatterns) {
+                    const match = voices.find(v => 
+                        v.name.includes(pattern.name) && v.lang === pattern.lang
+                    );
+                    if (match) {
+                        console.log('選擇粵語語音:', match.name);
+                        voiceCache[lang] = match;
+                        return match;
+                    }
+                }
+            }
+            
+            // 備選：任何匹配語言的語音
+            const fallback = voices.find(v => v.lang === lang);
+            if (fallback) {
+                console.log('使用備選語音:', fallback.name);
+                voiceCache[lang] = fallback;
+                return fallback;
+            }
+            
+            return null;
+        }
+        
+        // ========== 改良版TTS播放 ==========
+        function playTTSSequence(word, example1, example2, button) {
+            let step = 0;
+            // 播放順序：名詞2次，例句1一次，例句2一次
+            const playSteps = [
+                { type: 'word', text: word, repeat: 2 },        // 名詞讀2次
+                { type: 'example1', text: example1, repeat: 1 }, // 例句1讀1次
+                { type: 'example2', text: example2, repeat: 1 }  // 例句2讀1次
+            ];
+            
+            let currentStepIndex = 0;
+            let currentRepeatCount = 0;
+            
+            function speakNext() {
+                if (currentStepIndex >= playSteps.length) {
+                    // 全部播放完畢
+                    button.classList.remove('playing');
+                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    currentPlayingButton = null;
+                    return;
+                }
+                
+                const step = playSteps[currentStepIndex];
+                
+                const utterance = new SpeechSynthesisUtterance(step.text);
+                
+                // 設置語言和語音
+                if (currentLanguage === 'cantonese') {
+                    utterance.lang = 'zh-HK';
+                    const bestVoice = getBestVoice('zh-HK');
+                    if (bestVoice) utterance.voice = bestVoice;
+                } else {
+                    utterance.lang = 'zh-CN';
+                    const bestVoice = getBestVoice('zh-CN');
+                    if (bestVoice) utterance.voice = bestVoice;
+                }
+                
+                // 設置語速較慢，適合長者
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                utterance.onend = function() {
+                    currentRepeatCount++;
+                    
+                    if (currentRepeatCount < step.repeat) {
+                        // 同一句需要重複，間隔0.8秒
+                        setTimeout(speakNext, 800);
+                    } else {
+                        // 進入下一句
+                        currentStepIndex++;
+                        currentRepeatCount = 0;
+                        
+                        if (currentStepIndex < playSteps.length) {
+                            // 不同句之間間隔1.5秒
+                            setTimeout(speakNext, 1500);
+                        } else {
+                            // 全部播放完畢
+                            setTimeout(() => {
+                                button.classList.remove('playing');
+                                button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                                currentPlayingButton = null;
+                            }, 100);
+                        }
+                    }
+                };
+                
+                utterance.onerror = function() {
+                    console.log('TTS錯誤，跳過此句');
+                    currentStepIndex++;
+                    currentRepeatCount = 0;
+                    setTimeout(speakNext, 100);
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            }
+            
+            speakNext();
+        }
+        
+        // ========== 播放本地音頻 ==========
+        function playLocalAudio(audioPath, word, example1, example2, button) {
+            try {
+                currentAudio = new Audio(audioPath);
+                
+                currentAudio.onended = function() {
+                    currentAudio = null;
+                    button.classList.remove('playing');
+                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    currentPlayingButton = null;
+                };
+                
+                currentAudio.onerror = function() {
+                    console.log('本地音頻播放失敗，改用 TTS');
+                    currentAudio = null;
+                    playTTSSequence(word, example1, example2, button);
+                };
+                
+                currentAudio.play().catch(error => {
+                    console.log('本地音頻播放錯誤:', error);
+                    currentAudio = null;
+                    playTTSSequence(word, example1, example2, button);
+                });
+                
+            } catch (error) {
+                console.log('本地音頻初始化錯誤:', error);
+                playTTSSequence(word, example1, example2, button);
+            }
+        }
+        
+        // ========== 停止所有音頻 ==========
+        function stopAllAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            if (currentPlayingButton) {
+                currentPlayingButton.classList.remove('playing');
+                currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+                currentPlayingButton = null;
+            }
+        }
+        
+        // ========== 檢查數據加載狀態 ==========
         function checkDataLoaded() {
             const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
             let loadedCount = 0;
@@ -588,12 +789,11 @@
                     }
                 }
             } else {
-                // 1秒後再檢查
                 setTimeout(checkDataLoaded, 1000);
             }
         }
         
-        // 渲染卡片
+        // ========== 渲染卡片 ==========
         function renderCards(category, page) {
             const container = document.getElementById(`${category}-cards`);
             if (!container) return;
@@ -613,7 +813,6 @@
             container.innerHTML = '';
             
             pageCards.forEach(card => {
-                // 根據當前語言選擇音頻路徑
                 const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
                 
                 const cardHtml = `
@@ -663,7 +862,7 @@
             bindEvents();
         }
         
-        // 綁定事件
+        // ========== 綁定事件 ==========
         function bindEvents() {
             // 卡片翻轉
             document.querySelectorAll('.flashcard').forEach(card => {
@@ -674,7 +873,7 @@
                 });
             });
             
-            // 音頻播放 - 優先本地音頻，失敗則用 TTS
+            // 音頻播放
             document.querySelectorAll('.audio-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -685,156 +884,28 @@
                     const example2 = flashcard.dataset.example2;
                     const audioPath = flashcard.dataset.audio;
                     
-                    // 如果正在播放同一個按鈕
                     if (currentPlayingButton === this) {
                         stopAllAudio();
                         return;
                     }
                     
-                    // 停止當前所有播放
                     stopAllAudio();
                     
-                    // 設置新按鈕狀態
                     this.classList.add('playing');
                     this.innerHTML = '<i class="fas fa-pause"></i>';
                     currentPlayingButton = this;
                     
                     // 嘗試播放本地音頻
-                    playLocalAudio(audioPath, [word, example1, example2], this);
+                    playLocalAudio(audioPath, word, example1, example2, this);
                 });
             });
         }
         
-        // 停止所有音頻播放
-        function stopAllAudio() {
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-            
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-            }
-            
-            if (currentUtterance) {
-                currentUtterance = null;
-            }
-            
-            if (currentPlayingButton) {
-                currentPlayingButton.classList.remove('playing');
-                currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                currentPlayingButton = null;
-            }
-        }
-        
-        // 播放本地音頻
-        function playLocalAudio(audioPath, texts, button) {
-            try {
-                currentAudio = new Audio(audioPath);
-                
-                // 設置播放完成事件
-                currentAudio.onended = function() {
-                    currentAudio = null;
-                    button.classList.remove('playing');
-                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    currentPlayingButton = null;
-                };
-                
-                // 播放錯誤時改用 TTS
-                currentAudio.onerror = function() {
-                    console.log('本地音頻播放失敗，改用 TTS');
-                    currentAudio = null;
-                    playTTSSequence(texts, 1500, button);
-                };
-                
-                // 開始播放
-                currentAudio.play().catch(error => {
-                    console.log('本地音頻播放錯誤:', error);
-                    currentAudio = null;
-                    playTTSSequence(texts, 1500, button);
-                });
-                
-            } catch (error) {
-                console.log('本地音頻初始化錯誤:', error);
-                playTTSSequence(texts, 1500, button);
-            }
-        }
-        
-        // TTS 播放序列函數
-        function playTTSSequence(texts, pauseDuration, button) {
-            let index = 0;
-            
-            function speakNext() {
-                if (index >= texts.length) {
-                    // 播放完畢
-                    button.classList.remove('playing');
-                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    currentPlayingButton = null;
-                    return;
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(texts[index]);
-                
-                // 設置語言 - 嘗試使用更好的普通話語音
-                if (currentLanguage === 'cantonese') {
-                    utterance.lang = 'zh-HK';  // 粵語
-                } else {
-                    // 嘗試獲取更好的普通話語音
-                    const voices = window.speechSynthesis.getVoices();
-                    const chineseVoice = voices.find(voice => 
-                        voice.lang.includes('zh-CN') || voice.lang.includes('zh-TW')
-                    );
-                    if (chineseVoice) {
-                        utterance.voice = chineseVoice;
-                    }
-                    utterance.lang = 'zh-CN';  // 普通話
-                }
-                
-                // 設置語速較慢，適合長者
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                utterance.volume = 1;
-                
-                utterance.onend = function() {
-                    index++;
-                    if (index < texts.length) {
-                        // 暫停後播下一句
-                        setTimeout(speakNext, pauseDuration);
-                    } else {
-                        // 全部播放完畢
-                        setTimeout(() => {
-                            button.classList.remove('playing');
-                            button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                            currentPlayingButton = null;
-                        }, 100);
-                    }
-                };
-                
-                utterance.onerror = function() {
-                    console.log('TTS 播放錯誤');
-                    index++;
-                    if (index < texts.length) {
-                        setTimeout(speakNext, pauseDuration);
-                    } else {
-                        button.classList.remove('playing');
-                        button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                        currentPlayingButton = null;
-                    }
-                };
-                
-                window.speechSynthesis.speak(utterance);
-                currentUtterance = utterance;
-            }
-            
-            speakNext();
-        }
-        
-        // 標籤切換
+        // ========== 標籤切換 ==========
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const category = this.dataset.category;
                 
-                // 停止所有播放中的音頻
                 stopAllAudio();
                 
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -849,7 +920,7 @@
             });
         });
         
-        // 分頁按鈕
+        // ========== 分頁按鈕 ==========
         const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
         categories.forEach(category => {
             const prevBtn = document.getElementById(`${category}-prev`);
@@ -880,23 +951,27 @@
             }
         });
         
-        // 語言切換
+        // ========== 語言切換 ==========
         document.getElementById('langToggle').addEventListener('click', function() {
             stopAllAudio();
             
             currentLanguage = currentLanguage === 'cantonese' ? 'mandarin' : 'cantonese';
             this.querySelector('span').textContent = currentLanguage === 'cantonese' ? '切換至普通話' : '切換至粵語';
             
-            // 重新渲染當前分類以更新音頻路徑
             const activeCategory = document.querySelector('.tab-btn.active')?.dataset.category;
             if (activeCategory && window.cardsData[activeCategory]) {
                 renderCards(activeCategory, currentPages[activeCategory] || 1);
             }
         });
         
-        // 預加載語音列表
+        // ========== 預加載語音列表 ==========
         window.speechSynthesis.onvoiceschanged = function() {
-            window.speechSynthesis.getVoices();
+            // 清空快取，讓下次選擇時重新獲取
+            voiceCache = {
+                'zh-CN': null,
+                'zh-HK': null
+            };
+            console.log('語音列表已更新');
         };
         
         // 開始檢查數據
