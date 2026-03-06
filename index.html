@@ -171,6 +171,8 @@
         
         .card-front, .card-back {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
@@ -609,23 +611,7 @@
             emotion: '情緒'
         };
         
-        // ========== 輔助：播放提示音 ==========
-        function playClickSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.type = 'sine';
-                oscillator.frequency.value = 800;
-                gainNode.gain.value = 0.1;
-                oscillator.connect(gainNode).connect(audioCtx.destination);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.1);
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-            } catch (e) { /* 忽略 */ }
-        }
-
-        // ========== 觸控震動 ==========
+        // ========== 觸控震動 (保留，移除所有音效) ==========
         function vibrateFeedback() {
             if (navigator.vibrate) navigator.vibrate(20);
         }
@@ -859,7 +845,7 @@
             bindEvents();
         }
         
-        // ========== 綁定事件 ==========
+        // ========== 綁定事件 (移除所有音效) ==========
         function bindEvents() {
             // 卡片翻轉
             document.querySelectorAll('.flashcard').forEach(card => {
@@ -868,8 +854,7 @@
                 card.clickHandler = function(e) {
                     if (!e.target.closest('.audio-btn')) {
                         this.classList.toggle('flipped');
-                        playClickSound();
-                        vibrateFeedback();
+                        vibrateFeedback();  // 僅保留震動
                     }
                 };
                 
@@ -901,8 +886,7 @@
                     currentPlayingButton = this;
                     
                     playLocalAudio(audioPath, word, example1, example2, this);
-                    playClickSound();
-                    vibrateFeedback();
+                    vibrateFeedback();  // 僅保留震動
                 };
                 
                 btn.addEventListener('click', btn.clickHandler);
@@ -945,7 +929,7 @@
             }
         }
         
-        // ========== 標籤切換 ==========
+        // ========== 標籤切換 (移除音效) ==========
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const category = this.dataset.category;
@@ -962,12 +946,11 @@
                     renderCards(category, currentPages[category] || 1);
                 }
                 
-                playClickSound();
-                vibrateFeedback();
+                vibrateFeedback();  // 僅保留震動
             });
         });
         
-        // ========== 分頁按鈕 ==========
+        // ========== 分頁按鈕 (移除音效) ==========
         const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
         categories.forEach(category => {
             const prevBtn = document.getElementById(`${category}-prev`);
@@ -980,7 +963,6 @@
                     if (currentPages[category] > 1) {
                         currentPages[category]--;
                         renderCards(category, currentPages[category]);
-                        playClickSound();
                         vibrateFeedback();
                     }
                 });
@@ -995,23 +977,21 @@
                     if (currentPages[category] < totalPages) {
                         currentPages[category]++;
                         renderCards(category, currentPages[category]);
-                        playClickSound();
                         vibrateFeedback();
                     }
                 });
             }
         });
         
-        // ========== 字體放大切換 ==========
+        // ========== 字體放大切換 (移除音效) ==========
         document.getElementById('fontSizeToggle').addEventListener('click', function() {
             document.body.classList.toggle('ultra-large');
             const span = this.querySelector('span');
             span.textContent = document.body.classList.contains('ultra-large') ? '標準字體' : '放大字體';
-            playClickSound();
             vibrateFeedback();
         });
         
-        // ========== 語言切換 ==========
+        // ========== 語言切換 (移除音效) ==========
         document.getElementById('langToggle').addEventListener('click', function() {
             stopAllAudio();
             
@@ -1023,14 +1003,12 @@
                 renderCards(activeCategory, currentPages[activeCategory] || 1);
             }
             
-            playClickSound();
             vibrateFeedback();
         });
         
-        // ========== 返回頂部 ==========
+        // ========== 返回頂部 (移除音效) ==========
         document.getElementById('backToTop').addEventListener('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            playClickSound();
             vibrateFeedback();
         });
         
