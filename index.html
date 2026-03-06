@@ -650,70 +650,86 @@
             }
         }
 
-        // ========== 渲染卡片 (支援雙語例句) ==========
-        function renderCards(category, page) {
-            const container = document.getElementById(`${category}-cards`);
-            if (!container) return;
-            const cards = window.cardsData[category] || [];
-            if (cards.length === 0) {
-                container.innerHTML = '<div class="no-data-message">此分類暫無卡片數據</div>';
-                return;
-            }
-            const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
-            const start = (page-1)*CARDS_PER_PAGE;
-            const end = Math.min(start+CARDS_PER_PAGE, cards.length);
-            const pageCards = cards.slice(start, end);
-            
-            container.innerHTML = '';
-            pageCards.forEach(card => {
-                // 根據目前語言選取對應例句 (卡片數據需支援 exampleCanto, exampleMandarin 欄位)
-                // 若無則沿用舊有 example1/example2 作後備
-                let ex1, ex2;
-                if (currentLanguage === 'cantonese') {
-                    ex1 = card.exampleCanto1 || card.example1 || '';
-                    ex2 = card.exampleCanto2 || card.example2 || '';
-                } else {
-                    ex1 = card.exampleMandarin1 || card.example1 || '';
-                    ex2 = card.exampleMandarin2 || card.example2 || '';
-                }
-                const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
-                
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'flashcard';
-                cardDiv.dataset.category = category;
-                cardDiv.dataset.word = card.word;
-                cardDiv.dataset.example1 = ex1;
-                cardDiv.dataset.example2 = ex2;
-                cardDiv.dataset.audio = audioPath;
-                
-                cardDiv.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryNames[category]}</div>
-                            <div class="card-front-content">
-                                <div class="card-word">${card.word}</div>
-                                <div class="card-word-desc">${card.desc}</div>
-                                <div class="card-example"><i class="fas fa-quote-left"></i> ${ex1}</div>
-                                <div class="card-example"><i class="fas fa-quote-right"></i> ${ex2}</div>
-                            </div>
-                            <div class="card-footer">
-                                <button class="audio-btn"><i class="fas fa-volume-up"></i></button>
-                            </div>
+   // ========== 渲染卡片 (修複圖片錯位問題) ==========
+function renderCards(category, page) {
+    const container = document.getElementById(`${category}-cards`);
+    if (!container) return;
+    
+    const cards = window.cardsData[category] || [];
+    if (cards.length === 0) {
+        container.innerHTML = '<div class="no-data-message">此分類暫無卡片數據</div>';
+        return;
+    }
+    
+    const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
+    const startIndex = (page - 1) * CARDS_PER_PAGE;
+    const endIndex = Math.min(startIndex + CARDS_PER_PAGE, cards.length);
+    const pageCards = cards.slice(startIndex, endIndex);
+    
+    container.innerHTML = '';
+    
+    pageCards.forEach(card => {
+        // 根據目前語言選取對應例句
+        let ex1, ex2;
+        if (currentLanguage === 'cantonese') {
+            ex1 = card.exampleCanto1 || card.example1 || '';
+            ex2 = card.exampleCanto2 || card.example2 || '';
+        } else {
+            ex1 = card.exampleMandarin1 || card.example1 || '';
+            ex2 = card.exampleMandarin2 || card.example2 || '';
+        }
+        
+        const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
+        
+        // 使用原本的 HTML 結構，確保翻轉效果正常
+        const cardHtml = `
+            <div class="flashcard" data-category="${category}" 
+                 data-word="${card.word}" 
+                 data-example1="${ex1}" 
+                 data-example2="${ex2}"
+                 data-audio="${audioPath}">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryNames[category]}</div>
+                        <div class="card-front-content">
+                            <div class="card-word">${card.word}</div>
+                            <div class="card-word-desc">${card.desc}</div>
+                            <div class="card-example"><i class="fas fa-quote-left"></i> ${ex1}</div>
+                            <div class="card-example"><i class="fas fa-quote-right"></i> ${ex2}</div>
                         </div>
-                        <div class="card-back">
-                            <img src="${card.img}" alt="${card.word}" class="card-back-image" loading="lazy" onerror="this.src='images/placeholder.png'">
+                        <div class="card-footer">
+                            <button class="audio-btn">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
                         </div>
                     </div>
-                `;
-                container.appendChild(cardDiv);
-            });
-            
-            document.getElementById(`${category}-page`).textContent = `${page}/${totalPages}`;
-            document.getElementById(`${category}-prev`).disabled = (page <= 1);
-            document.getElementById(`${category}-next`).disabled = (page >= totalPages);
-            
-            bindEvents();
-        }
+                    <div class="card-back">
+                        <img src="${card.img}" alt="${card.word}" class="card-back-image" 
+                             loading="lazy" 
+                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23cccccc\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'Arial\' font-size=\'24\' fill=\'%23333333\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E';">
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML += cardHtml;
+    });
+    
+    // 更新頁碼
+    const pageIndicator = document.getElementById(`${category}-page`);
+    if (pageIndicator) {
+        pageIndicator.textContent = `${page}/${totalPages}`;
+    }
+    
+    // 更新按鈕狀態
+    const prevBtn = document.getElementById(`${category}-prev`);
+    const nextBtn = document.getElementById(`${category}-next`);
+    if (prevBtn) prevBtn.disabled = page <= 1;
+    if (nextBtn) nextBtn.disabled = page >= totalPages;
+    
+    // 綁定事件
+    bindEvents();
+}
 
         // ========== 綁定事件 (含震動+音效) ==========
         function bindEvents() {
