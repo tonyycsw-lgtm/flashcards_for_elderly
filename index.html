@@ -248,16 +248,46 @@
         }
         
         .card-back {
-            background: white;
+            background: #f0f0f0;  /* 淺灰色背景作為佔位 */
             border: 3px solid #667eea;
             transform: rotateY(180deg);
             padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 載入中的動畫效果 */
+        .card-back.loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loadingShimmer 1.5s infinite;
+            z-index: 2;
+        }
+        
+        @keyframes loadingShimmer {
+            to { left: 100%; }
         }
         
         .card-back-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-back-image.loaded {
+            opacity: 1;
+        }
+        
+        /* 圖片載入完成後隱藏載入動畫 */
+        .card-back-image.loaded ~ .card-back.loading::before {
+            display: none;
         }
         
         .card-footer {
@@ -589,6 +619,9 @@
         };
         const CARDS_PER_PAGE = 6;
         
+        // Intersection Observer 實例
+        let imageObserver = null;
+        
         // 當前頁碼
         let currentPages = {
             fruit: 1,
@@ -611,7 +644,7 @@
             emotion: '情緒'
         };
         
-        // ========== 觸控震動 (保留，移除所有音效) ==========
+        // ========== 觸控震動 ==========
         function vibrateFeedback() {
             if (navigator.vibrate) navigator.vibrate(20);
         }
@@ -759,6 +792,37 @@
             }
         }
         
+        // ========== 初始化 Intersection Observer ==========
+        function initImageObserver() {
+            if (imageObserver) return;
+            
+            imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            
+                            // 圖片載入完成後添加 loaded 類別
+                            img.onload = () => {
+                                img.classList.add('loaded');
+                                // 移除父容器的 loading 類別
+                                const cardBack = img.closest('.card-back');
+                                if (cardBack) {
+                                    cardBack.classList.remove('loading');
+                                }
+                            };
+                        }
+                        imageObserver.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px', // 提前50px載入
+                threshold: 0.01
+            });
+        }
+        
         // ========== 渲染卡片 ==========
         function renderCards(category, page) {
             const container = document.getElementById(`${category}-cards`);
@@ -779,6 +843,9 @@
             // 清空容器
             container.innerHTML = '';
             const fragment = document.createDocumentFragment();
+            
+            // 確保觀察者已初始化
+            initImageObserver();
             
             pageCards.forEach(card => {
                 // 根據語言選取例句
@@ -802,6 +869,9 @@
                 cardDiv.setAttribute('data-example2', ex2);
                 cardDiv.setAttribute('data-audio', audioPath);
                 
+                // 使用透明的 1x1 像素 base64 圖片作為預設佔位
+                const placeholderImage = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'500\' height=\'500\' viewBox=\'0 0 500 500\'%3E%3Crect width=\'500\' height=\'500\' fill=\'%23f0f0f0\'/%3E%3C/svg%3E';
+                
                 cardDiv.innerHTML = `
                     <div class="card-inner">
                         <div class="card-front">
@@ -818,8 +888,12 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="card-back">
-                            <img src="${card.img}" alt="${card.word}" class="card-back-image" loading="lazy">
+                        <div class="card-back loading">
+                            <img src="${placeholderImage}" 
+                                 data-src="${card.img}" 
+                                 alt="${card.word}" 
+                                 class="card-back-image" 
+                                 loading="lazy">
                         </div>
                     </div>
                 `;
@@ -828,6 +902,13 @@
             });
             
             container.appendChild(fragment);
+            
+            // 將所有圖片加入 Intersection Observer
+            container.querySelectorAll('.card-back-image[data-src]').forEach(img => {
+                if (imageObserver) {
+                    imageObserver.observe(img);
+                }
+            });
             
             // 更新頁碼
             const pageIndicator = document.getElementById(`${category}-page`);
@@ -845,7 +926,7 @@
             bindEvents();
         }
         
-        // ========== 綁定事件 (移除所有音效) ==========
+        // ========== 綁定事件 ==========
         function bindEvents() {
             // 卡片翻轉
             document.querySelectorAll('.flashcard').forEach(card => {
@@ -854,7 +935,7 @@
                 card.clickHandler = function(e) {
                     if (!e.target.closest('.audio-btn')) {
                         this.classList.toggle('flipped');
-                        vibrateFeedback();  // 僅保留震動
+                        vibrateFeedback();
                     }
                 };
                 
@@ -886,7 +967,7 @@
                     currentPlayingButton = this;
                     
                     playLocalAudio(audioPath, word, example1, example2, this);
-                    vibrateFeedback();  // 僅保留震動
+                    vibrateFeedback();
                 };
                 
                 btn.addEventListener('click', btn.clickHandler);
@@ -929,7 +1010,7 @@
             }
         }
         
-        // ========== 標籤切換 (移除音效) ==========
+        // ========== 標籤切換 ==========
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const category = this.dataset.category;
@@ -946,11 +1027,11 @@
                     renderCards(category, currentPages[category] || 1);
                 }
                 
-                vibrateFeedback();  // 僅保留震動
+                vibrateFeedback();
             });
         });
         
-        // ========== 分頁按鈕 (移除音效) ==========
+        // ========== 分頁按鈕 ==========
         const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
         categories.forEach(category => {
             const prevBtn = document.getElementById(`${category}-prev`);
@@ -983,7 +1064,7 @@
             }
         });
         
-        // ========== 字體放大切換 (移除音效) ==========
+        // ========== 字體放大切換 ==========
         document.getElementById('fontSizeToggle').addEventListener('click', function() {
             document.body.classList.toggle('ultra-large');
             const span = this.querySelector('span');
@@ -991,7 +1072,7 @@
             vibrateFeedback();
         });
         
-        // ========== 語言切換 (移除音效) ==========
+        // ========== 語言切換 ==========
         document.getElementById('langToggle').addEventListener('click', function() {
             stopAllAudio();
             
@@ -1006,7 +1087,7 @@
             vibrateFeedback();
         });
         
-        // ========== 返回頂部 (移除音效) ==========
+        // ========== 返回頂部 ==========
         document.getElementById('backToTop').addEventListener('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             vibrateFeedback();
