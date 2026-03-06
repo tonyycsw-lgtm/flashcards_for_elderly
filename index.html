@@ -20,13 +20,13 @@
             padding: 20px;
             max-width: 1400px;
             margin: 0 auto;
-            font-size: 22px; /* 基礎字體 */
+            font-size: 22px;
             transition: font-size 0.2s;
         }
         
-        /* 超大字形體類別 (點擊後套用) */
+        /* 超大字形體類別 */
         body.ultra-large {
-            font-size: 28px; /* 基礎字體增大約1.27倍，可調 */
+            font-size: 28px;
         }
         body.ultra-large .header h1 { font-size: 3rem; }
         body.ultra-large .header .subtitle { font-size: 1.8rem; }
@@ -98,13 +98,12 @@
             box-shadow: 0 8px 15px rgba(79, 70, 229, 0.2);
         }
         
-        /* 當前分類高亮：底色加下劃線 */
         .tab-btn.active {
             background-color: #4f46e5;
             color: white;
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
-            border-bottom: 6px solid #ffd966; /* 明顯下劃線 */
+            border-bottom: 6px solid #ffd966;
         }
         
         .category-content {
@@ -142,7 +141,6 @@
             font-size: 2rem;
         }
         
-        /* 恢復原來的閃卡網格 - 每行2列 */
         .flashcards-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -150,7 +148,6 @@
             margin: 30px 0;
         }
         
-        /* 恢復原來的卡片高度，圖片更大 */
         .flashcard {
             perspective: 1200px;
             height: 500px;
@@ -187,15 +184,15 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 25px;
-            /* 添加半透明深色遮罩（覆蓋在背景上） */
             position: relative;
             z-index: 1;
         }
+        
         .card-front::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.25); /* 半透明深色遮罩 */
+            background-color: rgba(0, 0, 0, 0.25);
             z-index: -1;
             border-radius: 25px;
         }
@@ -269,7 +266,6 @@
             z-index: 3;
         }
         
-        /* 加大播放按鈕尺寸 */
         .audio-btn {
             width: 90px;
             height: 90px;
@@ -349,7 +345,6 @@
             border-radius: 15px;
         }
         
-        /* 語言切換與字體放大浮動按鈕組 */
         .float-buttons {
             position: fixed;
             bottom: 30px;
@@ -385,6 +380,7 @@
         #backToTop {
             background-color: #2d3748;
         }
+        
         #backToTop:hover {
             background-color: #4a5568;
         }
@@ -437,7 +433,6 @@
             font-size: 1.5rem;
         }
         
-        /* 響應式設計 */
         @media (max-width: 1024px) {
             .flashcards-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -487,24 +482,91 @@
         <button class="tab-btn" data-category="emotion"><i class="fas fa-smile"></i> 情緒</button>
     </div>
     
-    <!-- 動態生成的分類內容會透過js填充，但容器需預留 (已存在) -->
-    <!-- 水果分類容器 (其餘類似，省略但實際程式碼中原有) -->
-    <div id="category-fruit" class="category-content active"> <div class="category-title"><i class="fas fa-apple-alt"></i> 水果</div><div class="flashcards-grid" id="fruit-cards"></div><div class="nav-controls"><button class="nav-btn" id="fruit-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="fruit-page">1/1</div><button class="nav-btn" id="fruit-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
-    <div id="category-color" class="category-content"> <div class="category-title"><i class="fas fa-palette"></i> 顏色</div><div class="flashcards-grid" id="color-cards"></div><div class="nav-controls"><button class="nav-btn" id="color-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="color-page">1/1</div><button class="nav-btn" id="color-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
-    <div id="category-clothing" class="category-content"> <div class="category-title"><i class="fas fa-tshirt"></i> 服裝</div><div class="flashcards-grid" id="clothing-cards"></div><div class="nav-controls"><button class="nav-btn" id="clothing-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="clothing-page">1/1</div><button class="nav-btn" id="clothing-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
-    <div id="category-toy" class="category-content"> <div class="category-title"><i class="fas fa-robot"></i> 玩具/遊戲</div><div class="flashcards-grid" id="toy-cards"></div><div class="nav-controls"><button class="nav-btn" id="toy-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="toy-page">1/1</div><button class="nav-btn" id="toy-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
-    <div id="category-transport" class="category-content"> <div class="category-title"><i class="fas fa-bus"></i> 交通工具</div><div class="flashcards-grid" id="transport-cards"></div><div class="nav-controls"><button class="nav-btn" id="transport-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="transport-page">1/1</div><button class="nav-btn" id="transport-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
-    <div id="category-vintage" class="category-content"> <div class="category-title"><i class="fas fa-clock"></i> 懷舊物品</div><div class="flashcards-grid" id="vintage-cards"></div><div class="nav-controls"><button class="nav-btn" id="vintage-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="vintage-page">1/1</div><button class="nav-btn" id="vintage-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
-    <div id="category-emotion" class="category-content"> <div class="category-title"><i class="fas fa-smile"></i> 情緒</div><div class="flashcards-grid" id="emotion-cards"></div><div class="nav-controls"><button class="nav-btn" id="emotion-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button><div class="page-indicator" id="emotion-page">1/1</div><button class="nav-btn" id="emotion-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button></div></div>
+    <!-- 水果分類 -->
+    <div id="category-fruit" class="category-content active">
+        <div class="category-title"><i class="fas fa-apple-alt"></i> 水果</div>
+        <div class="flashcards-grid" id="fruit-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="fruit-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="fruit-page">1/1</div>
+            <button class="nav-btn" id="fruit-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
     
-    <!-- 浮動按鈕組：字體放大、語言切換、返回頂部 -->
+    <!-- 顏色分類 -->
+    <div id="category-color" class="category-content">
+        <div class="category-title"><i class="fas fa-palette"></i> 顏色</div>
+        <div class="flashcards-grid" id="color-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="color-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="color-page">1/1</div>
+            <button class="nav-btn" id="color-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 服裝分類 -->
+    <div id="category-clothing" class="category-content">
+        <div class="category-title"><i class="fas fa-tshirt"></i> 服裝</div>
+        <div class="flashcards-grid" id="clothing-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="clothing-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="clothing-page">1/1</div>
+            <button class="nav-btn" id="clothing-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 玩具/遊戲分類 -->
+    <div id="category-toy" class="category-content">
+        <div class="category-title"><i class="fas fa-robot"></i> 玩具/遊戲</div>
+        <div class="flashcards-grid" id="toy-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="toy-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="toy-page">1/1</div>
+            <button class="nav-btn" id="toy-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 交通工具分類 -->
+    <div id="category-transport" class="category-content">
+        <div class="category-title"><i class="fas fa-bus"></i> 交通工具</div>
+        <div class="flashcards-grid" id="transport-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="transport-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="transport-page">1/1</div>
+            <button class="nav-btn" id="transport-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 懷舊物品分類 -->
+    <div id="category-vintage" class="category-content">
+        <div class="category-title"><i class="fas fa-clock"></i> 懷舊物品</div>
+        <div class="flashcards-grid" id="vintage-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="vintage-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="vintage-page">1/1</div>
+            <button class="nav-btn" id="vintage-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 情緒分類 -->
+    <div id="category-emotion" class="category-content">
+        <div class="category-title"><i class="fas fa-smile"></i> 情緒</div>
+        <div class="flashcards-grid" id="emotion-cards"></div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="emotion-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
+            <div class="page-indicator" id="emotion-page">1/1</div>
+            <button class="nav-btn" id="emotion-next" disabled><i class="fas fa-chevron-right"></i> 下一頁</button>
+        </div>
+    </div>
+    
+    <!-- 浮動按鈕組 -->
     <div class="float-buttons">
         <button class="float-btn" id="fontSizeToggle"><i class="fas fa-text-height"></i> <span>放大字體</span></button>
         <button class="float-btn" id="langToggle"><i class="fas fa-language"></i> <span>切換至普通話</span></button>
         <button class="float-btn" id="backToTop"><i class="fas fa-arrow-up"></i> 頂部</button>
     </div>
 
-    <!-- 加載數據文件 (假設存在，且已更新例句雙語結構) -->
+    <!-- 加載數據文件 -->
     <script src="data/data.js"></script>
     <script src="data/fruit.js"></script>
     <script src="data/color.js"></script>
@@ -515,19 +577,39 @@
     <script src="data/emotion.js"></script>
 
     <script>
-        // 全域變數
+        // 全局變數
         let currentAudio = null;
         let currentPlayingButton = null;
-        let currentLanguage = 'cantonese';  // 預設粵語
-        let voiceCache = { 'zh-CN': null, 'zh-HK': null };
+        let currentLanguage = 'cantonese';
+        let voiceCache = {
+            'zh-CN': null,
+            'zh-HK': null
+        };
         const CARDS_PER_PAGE = 6;
         
         // 當前頁碼
-        let currentPages = { fruit:1, color:1, clothing:1, toy:1, transport:1, vintage:1, emotion:1 };
+        let currentPages = {
+            fruit: 1,
+            color: 1,
+            clothing: 1,
+            toy: 1,
+            transport: 1,
+            vintage: 1,
+            emotion: 1
+        };
         
-        const categoryNames = { fruit:'水果', color:'顏色', clothing:'服裝', toy:'玩具/遊戲', transport:'交通工具', vintage:'懷舊物品', emotion:'情緒' };
+        // 分類名稱映射
+        const categoryNames = {
+            fruit: '水果',
+            color: '顏色',
+            clothing: '服裝',
+            toy: '玩具/遊戲',
+            transport: '交通工具',
+            vintage: '懷舊物品',
+            emotion: '情緒'
+        };
         
-        // ========== 輔助：播放提示音（簡單web audio）==========
+        // ========== 輔助：播放提示音 ==========
         function playClickSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -539,7 +621,6 @@
                 oscillator.connect(gainNode).connect(audioCtx.destination);
                 oscillator.start();
                 oscillator.stop(audioCtx.currentTime + 0.1);
-                // 自動恢復如果被掛起
                 if (audioCtx.state === 'suspended') audioCtx.resume();
             } catch (e) { /* 忽略 */ }
         }
@@ -548,30 +629,69 @@
         function vibrateFeedback() {
             if (navigator.vibrate) navigator.vibrate(20);
         }
-
+        
         // ========== TTS語音選擇 ==========
         function getBestVoice(lang) {
             if (voiceCache[lang]) return voiceCache[lang];
+            
             const voices = window.speechSynthesis.getVoices();
+            
             if (lang === 'zh-CN') {
-                const priority = ['Microsoft Xiaoxiao','Xiaoxiao','Microsoft Yunxi','Yunxi','Google 普通话','普通话'];
-                for (let name of priority) {
-                    const match = voices.find(v => v.name.includes(name) && v.lang === 'zh-CN');
-                    if (match) { voiceCache[lang]=match; return match; }
+                const priorityPatterns = [
+                    { name: 'Microsoft Xiaoxiao', lang: 'zh-CN' },
+                    { name: 'Xiaoxiao', lang: 'zh-CN' },
+                    { name: 'Microsoft Yunxi', lang: 'zh-CN' },
+                    { name: 'Yunxi', lang: 'zh-CN' },
+                    { name: 'Microsoft Yunyang', lang: 'zh-CN' },
+                    { name: 'Yunyang', lang: 'zh-CN' },
+                    { name: 'Google 普通话', lang: 'zh-CN' },
+                    { name: 'Google', lang: 'zh-CN' },
+                    { name: '普通话', lang: 'zh-CN' },
+                    { name: '中文', lang: 'zh-CN' }
+                ];
+                
+                for (let pattern of priorityPatterns) {
+                    const match = voices.find(v => 
+                        v.name.includes(pattern.name) && v.lang === pattern.lang
+                    );
+                    if (match) {
+                        voiceCache[lang] = match;
+                        return match;
+                    }
                 }
             } else if (lang === 'zh-HK') {
-                const priority = ['Microsoft HiuGaai','HiuGaai','Microsoft HiuMaan','HiuMaan','Google 粵語','廣東話','Cantonese'];
-                for (let name of priority) {
-                    const match = voices.find(v => v.name.includes(name) && v.lang === 'zh-HK');
-                    if (match) { voiceCache[lang]=match; return match; }
+                const priorityPatterns = [
+                    { name: 'Microsoft HiuGaai', lang: 'zh-HK' },
+                    { name: 'HiuGaai', lang: 'zh-HK' },
+                    { name: 'Microsoft HiuMaan', lang: 'zh-HK' },
+                    { name: 'HiuMaan', lang: 'zh-HK' },
+                    { name: 'Google 粵語', lang: 'zh-HK' },
+                    { name: 'Google', lang: 'zh-HK' },
+                    { name: '廣東話', lang: 'zh-HK' },
+                    { name: 'Cantonese', lang: 'zh-HK' }
+                ];
+                
+                for (let pattern of priorityPatterns) {
+                    const match = voices.find(v => 
+                        v.name.includes(pattern.name) && v.lang === pattern.lang
+                    );
+                    if (match) {
+                        voiceCache[lang] = match;
+                        return match;
+                    }
                 }
             }
+            
             const fallback = voices.find(v => v.lang === lang);
-            if (fallback) voiceCache[lang]=fallback;
-            return fallback;
+            if (fallback) {
+                voiceCache[lang] = fallback;
+                return fallback;
+            }
+            
+            return null;
         }
-
-        // ========== 播放TTS序列 (語速0.85) ==========
+        
+        // ========== 播放TTS序列 ==========
         function playTTSSequence(word, example1, example2, button) {
             const playQueue = [
                 { text: word, type: 'word' },
@@ -593,7 +713,7 @@
                 utterance.lang = currentLanguage === 'cantonese' ? 'zh-HK' : 'zh-CN';
                 const best = getBestVoice(utterance.lang);
                 if (best) utterance.voice = best;
-                utterance.rate = 0.85;      // 設定較慢語速
+                utterance.rate = 0.85;
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
@@ -618,252 +738,313 @@
             }
             speakNext();
         }
-
-        // ========== 播放本地音頻(若失敗則TTS) ==========
+        
+        // ========== 播放音頻 ==========
         function playLocalAudio(audioPath, word, example1, example2, button) {
-            // 為確保雙語例句正確，此處直接使用TTS (因本地音頻可能沒有雙語例句)
-            // 但保留本地音頻路徑以備擴展。
             playTTSSequence(word, example1, example2, button);
         }
-
+        
         // ========== 停止所有音頻 ==========
         function stopAllAudio() {
-            if (currentAudio) { currentAudio.pause(); currentAudio=null; }
-            window.speechSynthesis.cancel();
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
             if (currentPlayingButton) {
                 currentPlayingButton.classList.remove('playing');
                 currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
                 currentPlayingButton = null;
             }
         }
-
-        // ========== 預加載語音 (避免首次延遲) ==========
+        
+        // ========== 預加載語音 ==========
         function preloadVoices() {
-            // 強制觸發語音清單載入並快取
             if (window.speechSynthesis) {
                 window.speechSynthesis.getVoices();
-                // 稍後再快取常用語音
                 setTimeout(() => {
                     getBestVoice('zh-HK');
                     getBestVoice('zh-CN');
                 }, 500);
             }
         }
-
-   // ========== 渲染卡片 (修複圖片錯位問題) ==========
-function renderCards(category, page) {
-    const container = document.getElementById(`${category}-cards`);
-    if (!container) return;
-    
-    const cards = window.cardsData[category] || [];
-    if (cards.length === 0) {
-        container.innerHTML = '<div class="no-data-message">此分類暫無卡片數據</div>';
-        return;
-    }
-    
-    const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
-    const startIndex = (page - 1) * CARDS_PER_PAGE;
-    const endIndex = Math.min(startIndex + CARDS_PER_PAGE, cards.length);
-    const pageCards = cards.slice(startIndex, endIndex);
-    
-    container.innerHTML = '';
-    
-    pageCards.forEach(card => {
-        // 根據目前語言選取對應例句
-        let ex1, ex2;
-        if (currentLanguage === 'cantonese') {
-            ex1 = card.exampleCanto1 || card.example1 || '';
-            ex2 = card.exampleCanto2 || card.example2 || '';
-        } else {
-            ex1 = card.exampleMandarin1 || card.example1 || '';
-            ex2 = card.exampleMandarin2 || card.example2 || '';
-        }
         
-        const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
-        
-        // 使用原本的 HTML 結構，確保翻轉效果正常
-        const cardHtml = `
-            <div class="flashcard" data-category="${category}" 
-                 data-word="${card.word}" 
-                 data-example1="${ex1}" 
-                 data-example2="${ex2}"
-                 data-audio="${audioPath}">
-                <div class="card-inner">
-                    <div class="card-front">
-                        <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryNames[category]}</div>
-                        <div class="card-front-content">
-                            <div class="card-word">${card.word}</div>
-                            <div class="card-word-desc">${card.desc}</div>
-                            <div class="card-example"><i class="fas fa-quote-left"></i> ${ex1}</div>
-                            <div class="card-example"><i class="fas fa-quote-right"></i> ${ex2}</div>
+        // ========== 渲染卡片 ==========
+        function renderCards(category, page) {
+            const container = document.getElementById(`${category}-cards`);
+            if (!container) return;
+            
+            const cards = window.cardsData[category] || [];
+            
+            if (cards.length === 0) {
+                container.innerHTML = '<div class="no-data-message">此分類暫無卡片數據</div>';
+                return;
+            }
+            
+            const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
+            const startIndex = (page - 1) * CARDS_PER_PAGE;
+            const endIndex = Math.min(startIndex + CARDS_PER_PAGE, cards.length);
+            const pageCards = cards.slice(startIndex, endIndex);
+            
+            // 清空容器
+            container.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            
+            pageCards.forEach(card => {
+                // 根據語言選取例句
+                let ex1, ex2;
+                if (currentLanguage === 'cantonese') {
+                    ex1 = card.exampleCanto1 || card.example1 || '';
+                    ex2 = card.exampleCanto2 || card.example2 || '';
+                } else {
+                    ex1 = card.exampleMandarin1 || card.example1 || '';
+                    ex2 = card.exampleMandarin2 || card.example2 || '';
+                }
+                
+                const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
+                
+                // 創建卡片元素
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'flashcard';
+                cardDiv.setAttribute('data-category', category);
+                cardDiv.setAttribute('data-word', card.word);
+                cardDiv.setAttribute('data-example1', ex1);
+                cardDiv.setAttribute('data-example2', ex2);
+                cardDiv.setAttribute('data-audio', audioPath);
+                
+                cardDiv.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryNames[category]}</div>
+                            <div class="card-front-content">
+                                <div class="card-word">${card.word}</div>
+                                <div class="card-word-desc">${card.desc}</div>
+                                <div class="card-example"><i class="fas fa-quote-left"></i> ${ex1}</div>
+                                <div class="card-example"><i class="fas fa-quote-right"></i> ${ex2}</div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="audio-btn">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-footer">
-                            <button class="audio-btn">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
+                        <div class="card-back">
+                            <img src="${card.img}" alt="${card.word}" class="card-back-image" loading="lazy">
                         </div>
                     </div>
-                    <div class="card-back">
-                        <img src="${card.img}" alt="${card.word}" class="card-back-image" 
-                             loading="lazy" 
-                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23cccccc\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'Arial\' font-size=\'24\' fill=\'%23333333\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E';">
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        container.innerHTML += cardHtml;
-    });
-    
-    // 更新頁碼
-    const pageIndicator = document.getElementById(`${category}-page`);
-    if (pageIndicator) {
-        pageIndicator.textContent = `${page}/${totalPages}`;
-    }
-    
-    // 更新按鈕狀態
-    const prevBtn = document.getElementById(`${category}-prev`);
-    const nextBtn = document.getElementById(`${category}-next`);
-    if (prevBtn) prevBtn.disabled = page <= 1;
-    if (nextBtn) nextBtn.disabled = page >= totalPages;
-    
-    // 綁定事件
-    bindEvents();
-}
-
-        // ========== 綁定事件 (含震動+音效) ==========
-        function bindEvents() {
-            document.querySelectorAll('.flashcard').forEach(card => {
-                card.removeEventListener('click', card._clickHandler);
-                card._clickHandler = function(e) {
-                    if (!e.target.closest('.audio-btn')) {
-                        this.classList.toggle('flipped');
-                        playClickSound();      // 翻卡提示音
-                        vibrateFeedback();      // 輕微震動
-                    }
-                };
-                card.addEventListener('click', card._clickHandler);
+                `;
+                
+                fragment.appendChild(cardDiv);
             });
             
+            container.appendChild(fragment);
+            
+            // 更新頁碼
+            const pageIndicator = document.getElementById(`${category}-page`);
+            if (pageIndicator) {
+                pageIndicator.textContent = `${page}/${totalPages}`;
+            }
+            
+            // 更新按鈕狀態
+            const prevBtn = document.getElementById(`${category}-prev`);
+            const nextBtn = document.getElementById(`${category}-next`);
+            if (prevBtn) prevBtn.disabled = page <= 1;
+            if (nextBtn) nextBtn.disabled = page >= totalPages;
+            
+            // 綁定事件
+            bindEvents();
+        }
+        
+        // ========== 綁定事件 ==========
+        function bindEvents() {
+            // 卡片翻轉
+            document.querySelectorAll('.flashcard').forEach(card => {
+                card.removeEventListener('click', card.clickHandler);
+                
+                card.clickHandler = function(e) {
+                    if (!e.target.closest('.audio-btn')) {
+                        this.classList.toggle('flipped');
+                        playClickSound();
+                        vibrateFeedback();
+                    }
+                };
+                
+                card.addEventListener('click', card.clickHandler);
+            });
+            
+            // 音頻播放
             document.querySelectorAll('.audio-btn').forEach(btn => {
-                btn.removeEventListener('click', btn._audioHandler);
-                btn._audioHandler = function(e) {
+                btn.removeEventListener('click', btn.clickHandler);
+                
+                btn.clickHandler = function(e) {
                     e.stopPropagation();
-                    const card = this.closest('.flashcard');
-                    const word = card.dataset.word;
-                    const ex1 = card.dataset.example1;
-                    const ex2 = card.dataset.example2;
-                    const audioPath = card.dataset.audio;
+                    
+                    const flashcard = this.closest('.flashcard');
+                    const word = flashcard.dataset.word;
+                    const example1 = flashcard.dataset.example1;
+                    const example2 = flashcard.dataset.example2;
+                    const audioPath = flashcard.dataset.audio;
                     
                     if (currentPlayingButton === this) {
                         stopAllAudio();
                         return;
                     }
+                    
                     stopAllAudio();
+                    
                     this.classList.add('playing');
                     this.innerHTML = '<i class="fas fa-pause"></i>';
                     currentPlayingButton = this;
-                    playLocalAudio(audioPath, word, ex1, ex2, this);
                     
-                    playClickSound();   // 按鈕回饋
+                    playLocalAudio(audioPath, word, example1, example2, this);
+                    playClickSound();
                     vibrateFeedback();
                 };
-                btn.addEventListener('click', btn._audioHandler);
+                
+                btn.addEventListener('click', btn.clickHandler);
             });
         }
-
-        // ========== 分類切換 ==========
+        
+        // ========== 檢查數據加載 ==========
+        function checkDataLoaded() {
+            const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
+            let loadedCount = 0;
+            let totalCards = 0;
+            
+            categories.forEach(cat => {
+                if (window.cardsData[cat] && window.cardsData[cat].length > 0) {
+                    loadedCount++;
+                    totalCards += window.cardsData[cat].length;
+                }
+            });
+            
+            document.getElementById('loadingProgress').textContent = `已加載 ${loadedCount}/7 個分類，共 ${totalCards} 張卡片`;
+            
+            if (loadedCount > 0) {
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                    }, 500);
+                }, 500);
+                
+                for (let cat of categories) {
+                    if (window.cardsData[cat] && window.cardsData[cat].length > 0) {
+                        renderCards(cat, 1);
+                        break;
+                    }
+                }
+                
+                preloadVoices();
+            } else {
+                setTimeout(checkDataLoaded, 1000);
+            }
+        }
+        
+        // ========== 標籤切換 ==========
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const cat = this.dataset.category;
+                const category = this.dataset.category;
+                
                 stopAllAudio();
+                
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
-                document.getElementById(`category-${cat}`).classList.add('active');
-                if (window.cardsData[cat]?.length) renderCards(cat, currentPages[cat] || 1);
                 
-                playClickSound();  // 切換分類音效
+                document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`category-${category}`).classList.add('active');
+                
+                if (window.cardsData[category] && window.cardsData[category].length > 0) {
+                    renderCards(category, currentPages[category] || 1);
+                }
+                
+                playClickSound();
                 vibrateFeedback();
             });
         });
-
+        
         // ========== 分頁按鈕 ==========
-        const cats = ['fruit','color','clothing','toy','transport','vintage','emotion'];
-        cats.forEach(cat => {
-            const prev = document.getElementById(`${cat}-prev`);
-            const next = document.getElementById(`${cat}-next`);
-            if (prev) prev.addEventListener('click', ()=>{
-                stopAllAudio();
-                if (currentPages[cat] > 1) {
-                    currentPages[cat]--;
-                    renderCards(cat, currentPages[cat]);
-                    playClickSound(); vibrateFeedback();
-                }
-            });
-            if (next) next.addEventListener('click', ()=>{
-                stopAllAudio();
-                const total = Math.ceil((window.cardsData[cat]||[]).length / CARDS_PER_PAGE);
-                if (currentPages[cat] < total) {
-                    currentPages[cat]++;
-                    renderCards(cat, currentPages[cat]);
-                    playClickSound(); vibrateFeedback();
-                }
-            });
+        const categories = ['fruit', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
+        categories.forEach(category => {
+            const prevBtn = document.getElementById(`${category}-prev`);
+            const nextBtn = document.getElementById(`${category}-next`);
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    stopAllAudio();
+                    
+                    if (currentPages[category] > 1) {
+                        currentPages[category]--;
+                        renderCards(category, currentPages[category]);
+                        playClickSound();
+                        vibrateFeedback();
+                    }
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    stopAllAudio();
+                    
+                    const cards = window.cardsData[category] || [];
+                    const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
+                    if (currentPages[category] < totalPages) {
+                        currentPages[category]++;
+                        renderCards(category, currentPages[category]);
+                        playClickSound();
+                        vibrateFeedback();
+                    }
+                });
+            }
         });
-
+        
         // ========== 字體放大切換 ==========
         document.getElementById('fontSizeToggle').addEventListener('click', function() {
             document.body.classList.toggle('ultra-large');
             const span = this.querySelector('span');
             span.textContent = document.body.classList.contains('ultra-large') ? '標準字體' : '放大字體';
-            playClickSound(); vibrateFeedback();
+            playClickSound();
+            vibrateFeedback();
         });
-
+        
         // ========== 語言切換 ==========
         document.getElementById('langToggle').addEventListener('click', function() {
             stopAllAudio();
+            
             currentLanguage = currentLanguage === 'cantonese' ? 'mandarin' : 'cantonese';
             this.querySelector('span').textContent = currentLanguage === 'cantonese' ? '切換至普通話' : '切換至粵語';
-            const activeCat = document.querySelector('.tab-btn.active')?.dataset.category;
-            if (activeCat && window.cardsData[activeCat]) renderCards(activeCat, currentPages[activeCat] || 1);
-            playClickSound(); vibrateFeedback();
+            
+            const activeCategory = document.querySelector('.tab-btn.active')?.dataset.category;
+            if (activeCategory && window.cardsData[activeCategory]) {
+                renderCards(activeCategory, currentPages[activeCategory] || 1);
+            }
+            
+            playClickSound();
+            vibrateFeedback();
         });
-
+        
         // ========== 返回頂部 ==========
         document.getElementById('backToTop').addEventListener('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            playClickSound(); vibrateFeedback();
+            playClickSound();
+            vibrateFeedback();
         });
-
-        // ========== 檢查數據加載 ==========
-        function checkDataLoaded() {
-            const cats = ['fruit','color','clothing','toy','transport','vintage','emotion'];
-            let loaded = 0, totalCards = 0;
-            cats.forEach(c => {
-                if (window.cardsData[c]?.length) { loaded++; totalCards += window.cardsData[c].length; }
-            });
-            document.getElementById('loadingProgress').textContent = `已加載 ${loaded}/7 個分類，共 ${totalCards} 張卡片`;
-            if (loaded > 0) {
-                setTimeout(() => {
-                    document.getElementById('loadingOverlay').style.opacity = '0';
-                    setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 500);
-                }, 500);
-                for (let cat of cats) {
-                    if (window.cardsData[cat]?.length) { renderCards(cat, 1); break; }
-                }
-                preloadVoices(); // 預加載語音
-            } else {
-                setTimeout(checkDataLoaded, 1000);
-            }
-        }
-
-        // 語音清單變更時重設快取
+        
+        // ========== 語音列表更新 ==========
         window.speechSynthesis.onvoiceschanged = function() {
-            voiceCache = { 'zh-CN': null, 'zh-HK': null };
-            getBestVoice('zh-HK'); getBestVoice('zh-CN'); // 重新快取
+            voiceCache = {
+                'zh-CN': null,
+                'zh-HK': null
+            };
+            getBestVoice('zh-HK');
+            getBestVoice('zh-CN');
         };
-
+        
+        // 開始檢查數據
         setTimeout(checkDataLoaded, 500);
     </script>
 </body>
