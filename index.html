@@ -125,18 +125,18 @@
             font-size: 2rem;
         }
         
-        /* 移除 category-desc 樣式，因為我們要刪除說明文字 */
-        
+        /* 恢復原來的閃卡網格 - 每行2列 */
         .flashcards-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);  /* 改為每行3個卡片 */
-            gap: 25px;
-            margin: 20px 0;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 30px 0;
         }
         
+        /* 恢復原來的卡片高度，圖片更大 */
         .flashcard {
             perspective: 1200px;
-            height: 400px;  /* 稍微降低高度以適應更多卡片 */
+            height: 500px;  /* 增加高度讓圖片更大 */
             cursor: pointer;
         }
         
@@ -169,7 +169,7 @@
         .card-front {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
         }
         
         .card-front-content {
@@ -191,27 +191,27 @@
         }
         
         .card-word {
-            font-size: 3.5rem;  /* 稍微縮小字體以適應更多內容 */
+            font-size: 4rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
         }
         
         .card-word-desc {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             background-color: rgba(255, 255, 255, 0.15);
-            padding: 12px;
+            padding: 15px;
             border-radius: 15px;
         }
         
         .card-example {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-align: left;
-            padding: 5px 12px;
+            padding: 5px 15px;
             border-left: 4px solid rgba(255, 255, 255, 0.5);
         }
         
@@ -229,9 +229,9 @@
         }
         
         .card-footer {
-            margin-top: 10px;
+            margin-top: 15px;
             display: flex;
-            justify-content: center;  /* 置中顯示 */
+            justify-content: center;
             align-items: center;
         }
         
@@ -268,8 +268,6 @@
             70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        
-        /* 移除 flip-hint 樣式 */
         
         .nav-controls {
             display: flex;
@@ -389,22 +387,26 @@
             font-size: 1.5rem;
         }
         
-        @media (max-width: 1200px) {
+        /* 響應式設計 */
+        @media (max-width: 1024px) {
             .flashcards-grid {
-                grid-template-columns: repeat(2, 1fr);  /* 平板顯示2個 */
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
             }
+            .flashcard { height: 450px; }
+            .card-word { font-size: 3rem; }
         }
         
         @media (max-width: 768px) {
             body { padding: 15px; font-size: 18px; }
             .header h1 { font-size: 2rem; }
             .flashcards-grid {
-                grid-template-columns: 1fr;  /* 手機顯示1個 */
+                grid-template-columns: 1fr;
                 gap: 20px;
             }
-            .flashcard { height: 380px; }
+            .flashcard { height: 400px; }
             .tab-btn { min-width: 150px; padding: 15px 20px; font-size: 1.1rem; }
-            .card-word { font-size: 3rem; }
+            .card-word { font-size: 2.5rem; }
             .lang-toggle { bottom: 20px; right: 20px; padding: 15px 25px; }
             .audio-btn { width: 60px; height: 60px; font-size: 1.8rem; }
         }
@@ -436,7 +438,6 @@
     <!-- 水果分類 -->
     <div id="category-fruit" class="category-content active">
         <div class="category-title"><i class="fas fa-apple-alt"></i> 水果</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="fruit-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="fruit-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -448,7 +449,6 @@
     <!-- 顏色分類 -->
     <div id="category-color" class="category-content">
         <div class="category-title"><i class="fas fa-palette"></i> 顏色</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="color-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="color-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -460,7 +460,6 @@
     <!-- 服裝分類 -->
     <div id="category-clothing" class="category-content">
         <div class="category-title"><i class="fas fa-tshirt"></i> 服裝</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="clothing-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="clothing-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -472,7 +471,6 @@
     <!-- 玩具/遊戲分類 -->
     <div id="category-toy" class="category-content">
         <div class="category-title"><i class="fas fa-robot"></i> 玩具/遊戲</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="toy-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="toy-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -484,7 +482,6 @@
     <!-- 交通工具分類 -->
     <div id="category-transport" class="category-content">
         <div class="category-title"><i class="fas fa-bus"></i> 交通工具</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="transport-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="transport-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -496,7 +493,6 @@
     <!-- 懷舊物品分類 -->
     <div id="category-vintage" class="category-content">
         <div class="category-title"><i class="fas fa-clock"></i> 懷舊物品</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="vintage-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="vintage-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -508,7 +504,6 @@
     <!-- 情緒分類 -->
     <div id="category-emotion" class="category-content">
         <div class="category-title"><i class="fas fa-smile"></i> 情緒</div>
-        <!-- 已刪除 category-desc -->
         <div class="flashcards-grid" id="emotion-cards"></div>
         <div class="nav-controls">
             <button class="nav-btn" id="emotion-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
@@ -533,10 +528,11 @@
 
     <script>
         // 全局變數
-        let currentUtterance = null;  // 改用 SpeechSynthesisUtterance
+        let currentAudio = null;  // 用於本地音頻
+        let currentUtterance = null;  // 用於 TTS
         let currentPlayingButton = null;
-        let currentLanguage = 'mandarin';  // 預設為普通話
-        const CARDS_PER_PAGE = 6;  // 改為每頁6張卡片
+        let currentLanguage = 'cantonese';  // 預設為粵語
+        const CARDS_PER_PAGE = 6;  // 每頁6張卡片（2列 × 3行）
         
         // 當前頁碼
         let currentPages = {
@@ -617,8 +613,15 @@
             container.innerHTML = '';
             
             pageCards.forEach(card => {
+                // 根據當前語言選擇音頻路徑
+                const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
+                
                 const cardHtml = `
-                    <div class="flashcard" data-category="${category}" data-word="${card.word}" data-example1="${card.example1}" data-example2="${card.example2}">
+                    <div class="flashcard" data-category="${category}" 
+                         data-word="${card.word}" 
+                         data-example1="${card.example1}" 
+                         data-example2="${card.example2}"
+                         data-audio="${audioPath}">
                         <div class="card-inner">
                             <div class="card-front">
                                 <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryNames[category]}</div>
@@ -671,7 +674,7 @@
                 });
             });
             
-            // 音頻播放 - 使用瀏覽器 TTS
+            // 音頻播放 - 優先本地音頻，失敗則用 TTS
             document.querySelectorAll('.audio-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -680,34 +683,81 @@
                     const word = flashcard.dataset.word;
                     const example1 = flashcard.dataset.example1;
                     const example2 = flashcard.dataset.example2;
+                    const audioPath = flashcard.dataset.audio;
                     
                     // 如果正在播放同一個按鈕
-                    if (currentPlayingButton === this && window.speechSynthesis.speaking) {
-                        window.speechSynthesis.cancel();
-                        this.classList.remove('playing');
-                        this.innerHTML = '<i class="fas fa-volume-up"></i>';
-                        currentPlayingButton = null;
+                    if (currentPlayingButton === this) {
+                        stopAllAudio();
                         return;
                     }
                     
                     // 停止當前所有播放
-                    if (window.speechSynthesis.speaking) {
-                        window.speechSynthesis.cancel();
-                        if (currentPlayingButton) {
-                            currentPlayingButton.classList.remove('playing');
-                            currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                        }
-                    }
+                    stopAllAudio();
                     
                     // 設置新按鈕狀態
                     this.classList.add('playing');
                     this.innerHTML = '<i class="fas fa-pause"></i>';
                     currentPlayingButton = this;
                     
-                    // 開始播放序列
-                    playTTSSequence([word, example1, example2], 1500, this);
+                    // 嘗試播放本地音頻
+                    playLocalAudio(audioPath, [word, example1, example2], this);
                 });
             });
+        }
+        
+        // 停止所有音頻播放
+        function stopAllAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            if (currentUtterance) {
+                currentUtterance = null;
+            }
+            
+            if (currentPlayingButton) {
+                currentPlayingButton.classList.remove('playing');
+                currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+                currentPlayingButton = null;
+            }
+        }
+        
+        // 播放本地音頻
+        function playLocalAudio(audioPath, texts, button) {
+            try {
+                currentAudio = new Audio(audioPath);
+                
+                // 設置播放完成事件
+                currentAudio.onended = function() {
+                    currentAudio = null;
+                    button.classList.remove('playing');
+                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    currentPlayingButton = null;
+                };
+                
+                // 播放錯誤時改用 TTS
+                currentAudio.onerror = function() {
+                    console.log('本地音頻播放失敗，改用 TTS');
+                    currentAudio = null;
+                    playTTSSequence(texts, 1500, button);
+                };
+                
+                // 開始播放
+                currentAudio.play().catch(error => {
+                    console.log('本地音頻播放錯誤:', error);
+                    currentAudio = null;
+                    playTTSSequence(texts, 1500, button);
+                });
+                
+            } catch (error) {
+                console.log('本地音頻初始化錯誤:', error);
+                playTTSSequence(texts, 1500, button);
+            }
         }
         
         // TTS 播放序列函數
@@ -725,10 +775,18 @@
                 
                 const utterance = new SpeechSynthesisUtterance(texts[index]);
                 
-                // 設置語言
+                // 設置語言 - 嘗試使用更好的普通話語音
                 if (currentLanguage === 'cantonese') {
                     utterance.lang = 'zh-HK';  // 粵語
                 } else {
+                    // 嘗試獲取更好的普通話語音
+                    const voices = window.speechSynthesis.getVoices();
+                    const chineseVoice = voices.find(voice => 
+                        voice.lang.includes('zh-CN') || voice.lang.includes('zh-TW')
+                    );
+                    if (chineseVoice) {
+                        utterance.voice = chineseVoice;
+                    }
                     utterance.lang = 'zh-CN';  // 普通話
                 }
                 
@@ -765,6 +823,7 @@
                 };
                 
                 window.speechSynthesis.speak(utterance);
+                currentUtterance = utterance;
             }
             
             speakNext();
@@ -776,14 +835,7 @@
                 const category = this.dataset.category;
                 
                 // 停止所有播放中的音頻
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                    if (currentPlayingButton) {
-                        currentPlayingButton.classList.remove('playing');
-                        currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                        currentPlayingButton = null;
-                    }
-                }
+                stopAllAudio();
                 
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
@@ -805,15 +857,7 @@
             
             if (prevBtn) {
                 prevBtn.addEventListener('click', () => {
-                    // 停止所有播放中的音頻
-                    if (window.speechSynthesis.speaking) {
-                        window.speechSynthesis.cancel();
-                        if (currentPlayingButton) {
-                            currentPlayingButton.classList.remove('playing');
-                            currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                            currentPlayingButton = null;
-                        }
-                    }
+                    stopAllAudio();
                     
                     if (currentPages[category] > 1) {
                         currentPages[category]--;
@@ -824,15 +868,7 @@
             
             if (nextBtn) {
                 nextBtn.addEventListener('click', () => {
-                    // 停止所有播放中的音頻
-                    if (window.speechSynthesis.speaking) {
-                        window.speechSynthesis.cancel();
-                        if (currentPlayingButton) {
-                            currentPlayingButton.classList.remove('playing');
-                            currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                            currentPlayingButton = null;
-                        }
-                    }
+                    stopAllAudio();
                     
                     const cards = window.cardsData[category] || [];
                     const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
@@ -846,21 +882,22 @@
         
         // 語言切換
         document.getElementById('langToggle').addEventListener('click', function() {
-            // 停止所有播放中的音頻
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                if (currentPlayingButton) {
-                    currentPlayingButton.classList.remove('playing');
-                    currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    currentPlayingButton = null;
-                }
-            }
+            stopAllAudio();
             
             currentLanguage = currentLanguage === 'cantonese' ? 'mandarin' : 'cantonese';
             this.querySelector('span').textContent = currentLanguage === 'cantonese' ? '切換至普通話' : '切換至粵語';
             
-            // 不需要重新渲染卡片，只需改變語言設置
+            // 重新渲染當前分類以更新音頻路徑
+            const activeCategory = document.querySelector('.tab-btn.active')?.dataset.category;
+            if (activeCategory && window.cardsData[activeCategory]) {
+                renderCards(activeCategory, currentPages[activeCategory] || 1);
+            }
         });
+        
+        // 預加載語音列表
+        window.speechSynthesis.onvoiceschanged = function() {
+            window.speechSynthesis.getVoices();
+        };
         
         // 開始檢查數據
         setTimeout(checkDataLoaded, 500);
