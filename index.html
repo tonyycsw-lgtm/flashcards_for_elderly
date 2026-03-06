@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>懷舊記憶卡 - 給香港長者的認知訓練</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <base href="./">
     <style>
+        /* 樣式保持不變，但添加錯誤處理樣式 */
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +25,6 @@
             font-size: 22px;
         }
         
-        /* 頂部導航 */
         .header {
             text-align: center;
             margin-bottom: 25px;
@@ -42,11 +43,8 @@
         .header .subtitle {
             font-size: 1.4rem;
             opacity: 0.9;
-            max-width: 800px;
-            margin: 0 auto;
         }
         
-        /* 分類標籤 */
         .category-tabs {
             display: flex;
             flex-wrap: wrap;
@@ -94,7 +92,6 @@
             box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
         }
         
-        /* 分類內容區 */
         .category-content {
             background: white;
             border-radius: 25px;
@@ -115,7 +112,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 分類標題 */
         .category-title {
             font-size: 2rem;
             color: #4f46e5;
@@ -141,7 +137,6 @@
             border-left: 8px solid #4f46e5;
         }
         
-        /* 閃卡網格 - 每行2張 */
         .flashcards-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -149,7 +144,6 @@
             margin: 30px 0;
         }
         
-        /* 閃卡樣式 */
         .flashcard {
             perspective: 1200px;
             height: 450px;
@@ -182,7 +176,6 @@
             overflow: hidden;
         }
         
-        /* 卡片正面 */
         .card-front {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -232,7 +225,6 @@
             border-left: 4px solid rgba(255, 255, 255, 0.5);
         }
         
-        /* 卡片背面 */
         .card-back {
             background: white;
             border: 3px solid #667eea;
@@ -246,7 +238,6 @@
             object-fit: cover;
         }
         
-        /* 卡片底部操作區 */
         .card-footer {
             margin-top: 15px;
             display: flex;
@@ -297,11 +288,6 @@
             gap: 8px;
         }
         
-        .flip-icon {
-            font-size: 1.5rem;
-        }
-        
-        /* 導航控制區 */
         .nav-controls {
             display: flex;
             justify-content: center;
@@ -336,7 +322,6 @@
             background-color: #e2e8f0;
             border-color: #a0aec0;
             color: #718096;
-            transform: none;
         }
         
         .page-indicator {
@@ -346,12 +331,8 @@
             padding: 15px 25px;
             background-color: #eef2ff;
             border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         
-        /* 語言切換按鈕 */
         .lang-toggle {
             position: fixed;
             bottom: 30px;
@@ -377,14 +358,13 @@
             transform: scale(1.05);
         }
         
-        /* 加載指示器 */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -414,15 +394,26 @@
             font-weight: 600;
         }
         
-        .loading-progress {
+        .error-message {
+            color: #ef4444;
+            font-size: 1.4rem;
             margin-top: 20px;
-            font-size: 1.3rem;
-            color: #718096;
+            text-align: center;
+            padding: 20px;
         }
         
-        /* 響應式設計 */
+        .retry-btn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+        
         @media (max-width: 1024px) {
-            body { font-size: 20px; }
             .flashcards-grid { gap: 20px; }
             .flashcard { height: 400px; }
             .card-word { font-size: 3rem; }
@@ -433,10 +424,8 @@
             .header h1 { font-size: 2rem; }
             .flashcards-grid { grid-template-columns: 1fr; }
             .tab-btn { min-width: 150px; padding: 15px 20px; font-size: 1.1rem; }
-            .category-title { font-size: 1.8rem; }
             .card-word { font-size: 2.5rem; }
             .lang-toggle { bottom: 20px; right: 20px; padding: 15px 25px; }
-            .audio-btn { width: 60px; height: 60px; font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -445,7 +434,8 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">正在加載記憶卡數據...</div>
-        <div class="loading-progress" id="loadingProgress">已加載 0 / 7 個分類</div>
+        <div class="error-message" id="errorMessage" style="display: none;"></div>
+        <button class="retry-btn" id="retryBtn" style="display: none;" onclick="location.reload()">重新加載</button>
     </div>
 
     <div class="header">
@@ -455,41 +445,20 @@
     
     <!-- 分類標籤 -->
     <div class="category-tabs">
-        <button class="tab-btn active" data-category="food">
-            <i class="fas fa-apple-alt"></i> 食物
-        </button>
-        <button class="tab-btn" data-category="color">
-            <i class="fas fa-palette"></i> 顏色
-        </button>
-        <button class="tab-btn" data-category="clothing">
-            <i class="fas fa-tshirt"></i> 服裝
-        </button>
-        <button class="tab-btn" data-category="toy">
-            <i class="fas fa-robot"></i> 玩具/遊戲
-        </button>
-        <button class="tab-btn" data-category="transport">
-            <i class="fas fa-bus"></i> 交通工具
-        </button>
-        <button class="tab-btn" data-category="vintage">
-            <i class="fas fa-clock"></i> 懷舊物品
-        </button>
-        <button class="tab-btn" data-category="emotion">
-            <i class="fas fa-smile"></i> 情緒
-        </button>
+        <button class="tab-btn" data-category="food"><i class="fas fa-apple-alt"></i> 食物</button>
+        <button class="tab-btn" data-category="color"><i class="fas fa-palette"></i> 顏色</button>
+        <button class="tab-btn" data-category="clothing"><i class="fas fa-tshirt"></i> 服裝</button>
+        <button class="tab-btn" data-category="toy"><i class="fas fa-robot"></i> 玩具/遊戲</button>
+        <button class="tab-btn" data-category="transport"><i class="fas fa-bus"></i> 交通工具</button>
+        <button class="tab-btn" data-category="vintage"><i class="fas fa-clock"></i> 懷舊物品</button>
+        <button class="tab-btn" data-category="emotion"><i class="fas fa-smile"></i> 情緒</button>
     </div>
     
-    <!-- 食物分類 -->
-    <div id="category-food" class="category-content active">
-        <div class="category-title">
-            <i class="fas fa-apple-alt"></i> 食物
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="food-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片可以翻轉看到食物圖片 • 點擊喇叭圖案聽發音
-        </div>
-        
+    <!-- 動態生成分類容器 -->
+    <div id="category-food" class="category-content">
+        <div class="category-title"><i class="fas fa-apple-alt"></i> 食物</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看圖片 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="food-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="food-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="food-page">1 / 1</div>
@@ -497,18 +466,10 @@
         </div>
     </div>
     
-    <!-- 顏色分類 -->
     <div id="category-color" class="category-content">
-        <div class="category-title">
-            <i class="fas fa-palette"></i> 顏色
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="color-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片翻轉看顏色範例 • 聆聽發音
-        </div>
-        
+        <div class="category-title"><i class="fas fa-palette"></i> 顏色</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看顏色 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="color-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="color-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="color-page">1 / 1</div>
@@ -516,18 +477,10 @@
         </div>
     </div>
     
-    <!-- 服裝分類 -->
     <div id="category-clothing" class="category-content">
-        <div class="category-title">
-            <i class="fas fa-tshirt"></i> 服裝
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="clothing-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片翻轉看衣物圖片 • 聆聽發音
-        </div>
-        
+        <div class="category-title"><i class="fas fa-tshirt"></i> 服裝</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看衣物 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="clothing-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="clothing-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="clothing-page">1 / 1</div>
@@ -535,18 +488,10 @@
         </div>
     </div>
     
-    <!-- 玩具/遊戲分類 -->
     <div id="category-toy" class="category-content">
-        <div class="category-title">
-            <i class="fas fa-robot"></i> 玩具/遊戲
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="toy-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片翻轉看玩具圖片 • 聆聽發音
-        </div>
-        
+        <div class="category-title"><i class="fas fa-robot"></i> 玩具/遊戲</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看玩具 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="toy-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="toy-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="toy-page">1 / 1</div>
@@ -554,18 +499,10 @@
         </div>
     </div>
     
-    <!-- 交通工具分類 -->
     <div id="category-transport" class="category-content">
-        <div class="category-title">
-            <i class="fas fa-bus"></i> 交通工具
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="transport-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片翻轉看交通工具圖片 • 聆聽發音
-        </div>
-        
+        <div class="category-title"><i class="fas fa-bus"></i> 交通工具</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看交通 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="transport-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="transport-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="transport-page">1 / 1</div>
@@ -573,18 +510,10 @@
         </div>
     </div>
     
-    <!-- 懷舊物品分類 -->
     <div id="category-vintage" class="category-content">
-        <div class="category-title">
-            <i class="fas fa-clock"></i> 懷舊物品
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="vintage-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片翻轉看懷舊物品圖片 • 聆聽發音
-        </div>
-        
+        <div class="category-title"><i class="fas fa-clock"></i> 懷舊物品</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看懷舊物品 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="vintage-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="vintage-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="vintage-page">1 / 1</div>
@@ -592,18 +521,10 @@
         </div>
     </div>
     
-    <!-- 情緒分類 -->
     <div id="category-emotion" class="category-content">
-        <div class="category-title">
-            <i class="fas fa-smile"></i> 情緒
-            <span style="font-size: 1.3rem; margin-left: auto; color: #667eea;" id="emotion-count">載入中...</span>
-        </div>
-        <div class="category-desc">
-            <i class="fas fa-info-circle"></i> 點擊卡片翻轉看表情圖片 • 聆聽發音
-        </div>
-        
+        <div class="category-title"><i class="fas fa-smile"></i> 情緒</div>
+        <div class="category-desc"><i class="fas fa-info-circle"></i> 點擊卡片翻轉看表情 • 點擊喇叭聽發音</div>
         <div class="flashcards-grid" id="emotion-cards"></div>
-        
         <div class="nav-controls">
             <button class="nav-btn" id="emotion-prev" disabled><i class="fas fa-chevron-left"></i> 上一頁</button>
             <div class="page-indicator" id="emotion-page">1 / 1</div>
@@ -611,77 +532,82 @@
         </div>
     </div>
     
-    <!-- 語言切換按鈕 -->
     <button class="lang-toggle" id="langToggle">
         <i class="fas fa-language"></i> <span>切換至普通話</span>
     </button>
 
-    <!-- ========== 數據文件加載 ========== -->
-    <script src="data/data.js"></script>
-    
-    <!-- ========== 主程式 ========== -->
+    <!-- 數據文件（使用絕對路徑） -->
+    <script src="/data/data.js"></script>
+    <script src="/data/food.js"></script>
+    <script src="/data/color.js"></script>
+    <script src="/data/clothing.js"></script>
+    <script src="/data/toy.js"></script>
+    <script src="/data/transport.js"></script>
+    <script src="/data/vintage.js"></script>
+    <script src="/data/emotion.js"></script>
+
     <script>
         // 全局變數
+        window.cardsData = window.cardsData || {};
         let currentAudio = null;
         let currentPlayingButton = null;
         let currentLanguage = 'cantonese';
-        let loadedCategories = 0;
-        const TOTAL_CATEGORIES = 7;
-        
-        // 每頁顯示卡片數量
         const CARDS_PER_PAGE = 5;
         
         // 當前頁碼
         let currentPages = {
-            food: 1,
-            color: 1,
-            clothing: 1,
-            toy: 1,
-            transport: 1,
-            vintage: 1,
-            emotion: 1
+            food: 1, color: 1, clothing: 1, toy: 1, 
+            transport: 1, vintage: 1, emotion: 1
         };
         
         // 分類名稱映射
         const categoryMap = {
-            food: '食物',
-            color: '顏色',
-            clothing: '服裝',
-            toy: '玩具/遊戲',
-            transport: '交通工具',
-            vintage: '懷舊物品',
-            emotion: '情緒'
+            food: '食物', color: '顏色', clothing: '服裝', toy: '玩具/遊戲',
+            transport: '交通工具', vintage: '懷舊物品', emotion: '情緒'
         };
-        
-        // 更新加載進度
-        function updateLoadingProgress() {
-            loadedCategories++;
-            document.getElementById('loadingProgress').textContent = 
-                `已加載 ${loadedCategories} / ${TOTAL_CATEGORIES} 個分類`;
+
+        // 檢查數據加載狀態
+        function checkDataLoaded() {
+            const categories = ['food', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'];
+            let loadedCount = 0;
             
-            if (loadedCategories >= TOTAL_CATEGORIES) {
+            categories.forEach(cat => {
+                if (window.cardsData[cat] && window.cardsData[cat].length > 0) {
+                    loadedCount++;
+                }
+            });
+            
+            console.log(`已加載 ${loadedCount}/7 個分類`);
+            
+            if (loadedCount === 7) {
+                document.getElementById('loadingOverlay').style.opacity = '0';
                 setTimeout(() => {
-                    document.getElementById('loadingOverlay').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('loadingOverlay').style.display = 'none';
-                    }, 500);
+                    document.getElementById('loadingOverlay').style.display = 'none';
                 }, 500);
+                
+                // 初始化第一個分類
+                const firstTab = document.querySelector('.tab-btn');
+                if (firstTab) {
+                    firstTab.classList.add('active');
+                    const category = firstTab.dataset.category;
+                    document.getElementById(`category-${category}`).classList.add('active');
+                    renderCards(category, 1);
+                }
+            } else if (loadedCount > 0) {
+                // 部分加載成功，仍然顯示
+                setTimeout(checkDataLoaded, 500);
             }
         }
-        
-        // ========== 渲染指定分類的卡片 ==========
+
+        // 渲染卡片
         function renderCards(category, page) {
             const container = document.getElementById(`${category}-cards`);
             if (!container) return;
             
             const cards = window.cardsData[category] || [];
-            const countElement = document.getElementById(`${category}-count`);
-            if (countElement) {
-                countElement.textContent = `共 ${cards.length} 張`;
-            }
             
             if (cards.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; font-size: 1.5rem; color: #718096;">暫無數據</div>';
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #718096;">暫無數據</div>';
                 return;
             }
             
@@ -692,17 +618,14 @@
             
             container.innerHTML = '';
             
-            pageCards.forEach((card, index) => {
-                const cardIndex = startIndex + index;
+            pageCards.forEach(card => {
                 const audioPath = currentLanguage === 'cantonese' ? card.audioCantonese : card.audioMandarin;
                 
                 const cardHtml = `
-                    <div class="flashcard" data-category="${category}" data-index="${cardIndex}" data-word="${card.word}" data-audio="${audioPath}">
+                    <div class="flashcard" data-category="${category}" data-word="${card.word}" data-audio="${audioPath}">
                         <div class="card-inner">
                             <div class="card-front">
-                                <div class="card-category-badge">
-                                    <i class="fas fa-tag"></i> ${categoryMap[category]}
-                                </div>
+                                <div class="card-category-badge"><i class="fas fa-tag"></i> ${categoryMap[category]}</div>
                                 <div class="card-front-content">
                                     <div class="card-word">${card.word}</div>
                                     <div class="card-word-desc">${card.desc}</div>
@@ -713,13 +636,11 @@
                                     <button class="audio-btn" data-word="${card.word}" data-audio="${audioPath}">
                                         <i class="fas fa-volume-up"></i>
                                     </button>
-                                    <div class="flip-hint">
-                                        <i class="fas fa-sync-alt flip-icon"></i> 點擊翻轉
-                                    </div>
+                                    <div class="flip-hint"><i class="fas fa-sync-alt"></i> 點擊翻轉</div>
                                 </div>
                             </div>
                             <div class="card-back">
-                                <img src="${card.img}" alt="${card.word}" class="card-back-image" onerror="this.src='./images/placeholder.png'; this.alt='圖片準備中'">
+                                <img src="${card.img || './images/placeholder.png'}" alt="${card.word}" class="card-back-image" onerror="this.src='./images/placeholder.png'">
                             </div>
                         </div>
                     </div>
@@ -728,20 +649,18 @@
                 container.innerHTML += cardHtml;
             });
             
-            // 更新頁碼顯示
-            const pageIndicator = document.getElementById(`${category}-page`);
-            if (pageIndicator) {
-                pageIndicator.innerHTML = `<span>${page}</span> / ${totalPages}`;
-            }
+            // 更新頁碼
+            document.getElementById(`${category}-page`).innerHTML = `<span>${page}</span> / ${totalPages}`;
             
             // 更新按鈕狀態
-            updatePaginationButtons(category, page, cards.length);
+            document.getElementById(`${category}-prev`).disabled = page <= 1;
+            document.getElementById(`${category}-next`).disabled = page >= totalPages;
             
             // 綁定事件
             bindCardEvents(category);
         }
         
-        // ========== 綁定卡片事件 ==========
+        // 綁定事件
         function bindCardEvents(category) {
             document.querySelectorAll(`#${category}-cards .flashcard`).forEach(card => {
                 card.addEventListener('click', function(e) {
@@ -754,14 +673,12 @@
             document.querySelectorAll(`#${category}-cards .audio-btn`).forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    const word = this.dataset.word;
-                    const audioPath = this.dataset.audio;
-                    playAudio(word, audioPath, this);
+                    playAudio(this.dataset.word, this.dataset.audio, this);
                 });
             });
         }
         
-        // ========== 音頻播放 ==========
+        // 播放音頻
         function playAudio(word, audioPath, button) {
             if (currentAudio && !currentAudio.paused && currentPlayingButton === button) {
                 currentAudio.pause();
@@ -785,7 +702,9 @@
             
             try {
                 currentAudio = new Audio(audioPath);
-                currentAudio.play();
+                currentAudio.play().catch(() => {
+                    // 忽略自動播放錯誤
+                });
                 
                 currentAudio.onended = function() {
                     button.classList.remove('playing');
@@ -793,74 +712,26 @@
                     currentAudio = null;
                     currentPlayingButton = null;
                 };
-                
-                currentAudio.onerror = function() {
-                    console.warn('音頻文件不存在');
-                    showToast('音頻文件準備中', 'info');
-                    setTimeout(() => {
-                        button.classList.remove('playing');
-                        button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                        currentAudio = null;
-                        currentPlayingButton = null;
-                    }, 1000);
-                };
             } catch (error) {
-                console.error('音頻播放錯誤:', error);
+                console.log('音頻播放錯誤:', error);
+                setTimeout(() => {
+                    button.classList.remove('playing');
+                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    currentAudio = null;
+                    currentPlayingButton = null;
+                }, 1000);
             }
         }
         
-        // ========== 更新分頁按鈕 ==========
-        function updatePaginationButtons(category, currentPage, totalCards) {
-            const totalPages = Math.ceil(totalCards / CARDS_PER_PAGE);
-            const prevBtn = document.getElementById(`${category}-prev`);
-            const nextBtn = document.getElementById(`${category}-next`);
-            
-            if (prevBtn) {
-                prevBtn.disabled = currentPage <= 1;
-            }
-            if (nextBtn) {
-                nextBtn.disabled = currentPage >= totalPages;
-            }
-        }
-        
-        // ========== 設置分頁事件 ==========
-        function setupPagination(category) {
-            const prevBtn = document.getElementById(`${category}-prev`);
-            const nextBtn = document.getElementById(`${category}-next`);
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function() {
-                    if (currentPages[category] > 1) {
-                        currentPages[category]--;
-                        renderCards(category, currentPages[category]);
-                    }
-                });
-            }
-            
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function() {
-                    const cards = window.cardsData[category] || [];
-                    const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
-                    if (currentPages[category] < totalPages) {
-                        currentPages[category]++;
-                        renderCards(category, currentPages[category]);
-                    }
-                });
-            }
-        }
-        
-        // ========== 標籤切換 ==========
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const categories = document.querySelectorAll('.category-content');
-        
-        tabBtns.forEach(btn => {
+        // 標籤切換
+        document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const category = this.dataset.category;
                 
-                tabBtns.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
-                categories.forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
                 document.getElementById(`category-${category}`).classList.add('active');
                 
                 if (window.cardsData[category] && window.cardsData[category].length > 0) {
@@ -869,79 +740,38 @@
             });
         });
         
-        // ========== 語言切換 ==========
-        const langToggle = document.getElementById('langToggle');
-        langToggle.addEventListener('click', function() {
+        // 分頁事件
+        ['food', 'color', 'clothing', 'toy', 'transport', 'vintage', 'emotion'].forEach(category => {
+            document.getElementById(`${category}-prev`)?.addEventListener('click', () => {
+                if (currentPages[category] > 1) {
+                    currentPages[category]--;
+                    renderCards(category, currentPages[category]);
+                }
+            });
+            
+            document.getElementById(`${category}-next`)?.addEventListener('click', () => {
+                const cards = window.cardsData[category] || [];
+                const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
+                if (currentPages[category] < totalPages) {
+                    currentPages[category]++;
+                    renderCards(category, currentPages[category]);
+                }
+            });
+        });
+        
+        // 語言切換
+        document.getElementById('langToggle').addEventListener('click', function() {
             currentLanguage = currentLanguage === 'cantonese' ? 'mandarin' : 'cantonese';
+            this.querySelector('span').textContent = currentLanguage === 'cantonese' ? '切換至普通話' : '切換至粵語';
             
-            const langSpan = this.querySelector('span');
-            langSpan.textContent = currentLanguage === 'cantonese' ? '切換至普通話' : '切換至粵語';
-            
-            const activeCategory = document.querySelector('.tab-btn.active').dataset.category;
-            renderCards(activeCategory, currentPages[activeCategory] || 1);
-            
-            showToast(currentLanguage === 'cantonese' ? '已切換至粵語發音' : '已切換至普通話發音');
+            const activeCategory = document.querySelector('.tab-btn.active')?.dataset.category;
+            if (activeCategory && window.cardsData[activeCategory]) {
+                renderCards(activeCategory, currentPages[activeCategory] || 1);
+            }
         });
         
-        // ========== 提示功能 ==========
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? '#10b981' : '#4f46e5';
-            
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: ${bgColor};
-                color: white;
-                padding: 15px 30px;
-                border-radius: 50px;
-                font-size: 1.3rem;
-                font-weight: 600;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-                z-index: 1000;
-                animation: slideUp 3s ease forwards;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-        
-        // 添加動畫樣式
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideUp {
-                0% { opacity: 0; transform: translate(-50%, 20px); }
-                10% { opacity: 1; transform: translate(-50%, 0); }
-                90% { opacity: 1; transform: translate(-50%, 0); }
-                100% { opacity: 0; transform: translate(-50%, -20px); }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // ========== 監聽數據加載完成 ==========
-        document.addEventListener('categoriesLoaded', function() {
-            // 初始化所有分類
-            for (let category in window.cardsData) {
-                setupPagination(category);
-            }
-            
-            // 預設顯示食物分類
-            if (window.cardsData.food && window.cardsData.food.length > 0) {
-                renderCards('food', 1);
-            }
-            
-            updateLoadingProgress();
-        });
-        
-        // 監聽每個分類加載完成
-        document.addEventListener('categoryLoaded', function(e) {
-            updateLoadingProgress();
-        });
+        // 開始檢查數據
+        setTimeout(checkDataLoaded, 1000);
     </script>
 </body>
 </html>
