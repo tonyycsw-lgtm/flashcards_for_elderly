@@ -678,7 +678,8 @@
             'zh-CN': null,
             'zh-HK': null
         };
-        const CARDS_PER_PAGE = 6;
+        let currentPlayId = null;
+	const CARDS_PER_PAGE = 6;
         
         // 當前頁碼
         let currentPages = {
@@ -779,75 +780,114 @@
             return null;
         }
         
-        // ========== 播放TTS序列 ==========
-        function playTTSSequence(word, example1, example2, button) {
-            const playQueue = [
-                { text: word, type: 'word' },
-                { text: example1, type: 'example1' },
-                { text: example2, type: 'example2' }
-            ];
-            let currentIndex = 0;
+// ========== 播放TTS序列（改良版）==========
+function playTTSSequence(word, example1, example2, button) {
+    const playId = Date.now() + Math.random(); // 生成唯一ID
+    currentPlayId = playId;
+    
+    const playQueue = [
+        { text: word, type: 'word' },
+        { text: example1, type: 'example1' },
+        { text: example2, type: 'example2' }
+    ];
+    let currentIndex = 0;
+    
+    function speakNext() {
+        // 如果這個播放序列已經不是最新的，停止播放
+        if (currentPlayId !== playId) {
+            return;
+        }
+        
+        if (currentIndex >= playQueue.length) {
+            // 確保只有最新的播放按鈕才重置狀態
+            if (currentPlayingButton === button && currentPlayId === playId) {
+                button.classList.remove('playing');
+                button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                currentPlayingButton = null;
+                currentPlayId = null;
+            }
+            return;
+        }
+        
+        const item = playQueue[currentIndex];
+        const utterance = new SpeechSynthesisUtterance(item.text);
+        utterance.lang = currentLanguage === 'cantonese' ? 'zh-HK' : 'zh-CN';
+        const best = getBestVoice(utterance.lang);
+        if (best) utterance.voice = best;
+        utterance.rate = 0.85;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        
+        utterance.onend = () => {
+            // 檢查是否還是同一個播放序列
+            if (currentPlayId !== playId) return;
             
-            function speakNext() {
-                if (currentIndex >= playQueue.length) {
-                    button.classList.remove('playing');
-                    button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    currentPlayingButton = null;
-                    return;
-                }
-                const item = playQueue[currentIndex];
-                const utterance = new SpeechSynthesisUtterance(item.text);
-                utterance.lang = currentLanguage === 'cantonese' ? 'zh-HK' : 'zh-CN';
-                const best = getBestVoice(utterance.lang);
-                if (best) utterance.voice = best;
-                utterance.rate = 0.85;
-                utterance.pitch = 1;
-                utterance.volume = 1;
-                
-                utterance.onend = () => {
-                    currentIndex++;
-                    if (currentIndex < playQueue.length) {
-                        const delay = (playQueue[currentIndex].type === item.type) ? 800 : 1500;
-                        setTimeout(speakNext, delay);
-                    } else {
-                        setTimeout(() => {
-                            button.classList.remove('playing');
-                            button.innerHTML = '<i class="fas fa-volume-up"></i>';
-                            currentPlayingButton = null;
-                        }, 100);
+            currentIndex++;
+            if (currentIndex < playQueue.length) {
+                const delay = (playQueue[currentIndex].type === item.type) ? 800 : 1500;
+                setTimeout(speakNext, delay);
+            } else {
+                setTimeout(() => {
+                    if (currentPlayingButton === button && currentPlayId === playId) {
+                        button.classList.remove('playing');
+                        button.innerHTML = '<i class="fas fa-volume-up"></i>';
+                        currentPlayingButton = null;
+                        currentPlayId = null;
                     }
-                };
-                utterance.onerror = () => {
-                    currentIndex++;
-                    setTimeout(speakNext, 100);
-                };
+                }, 100);
+            }
+        };
+        
+        utterance.onerror = () => {
+            if (currentPlayId !== playId) return;
+            currentIndex++;
+            setTimeout(speakNext, 100);
+        };
+        
+        // 在開始新語音前，確保取消所有正在進行的語音
+        window.speechSynthesis.cancel();
+        
+        // 短暫延遲確保 cancel 完成
+        setTimeout(() => {
+            if (currentPlayId === playId) {
                 window.speechSynthesis.speak(utterance);
             }
-            speakNext();
-        }
+        }, 50);
+    }
+    
+    speakNext();
+}
         
         // ========== 播放音頻 ==========
         function playLocalAudio(audioPath, word, example1, example2, button) {
             playTTSSequence(word, example1, example2, button);
         }
         
-        // ========== 停止所有音頻 ==========
-        function stopAllAudio() {
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-            
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-            }
-            
-            if (currentPlayingButton) {
-                currentPlayingButton.classList.remove('playing');
-                currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                currentPlayingButton = null;
-            }
-        }
+// ========== 停止所有音頻（改良版）==========
+function stopAllAudio() {
+    // 清除當前播放ID
+    currentPlayId = null;
+    
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
+    // 多次呼叫 cancel 以確保清除
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        // 有些瀏覽器需要短時間內呼叫兩次
+        setTimeout(() => {
+            window.speechSynthesis.cancel();
+        }, 10);
+    }
+    
+    if (currentPlayingButton) {
+        currentPlayingButton.classList.remove('playing');
+        currentPlayingButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+        currentPlayingButton = null;
+    }
+}
         
         // ========== 預加載語音 ==========
         function preloadVoices() {
